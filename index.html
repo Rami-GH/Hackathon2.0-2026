@@ -89,20 +89,53 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
     return'Unknown or plain-text header';
   }
   function extension(name){const m=name.toLowerCase().match(/\.([a-z0-9]{1,12})$/);return m?m[1]:''}
-  function analyze(file,bytes,header){
+  function inspectZip(data){
+    if(data.length<22||data[0]!==0x50||data[1]!==0x4b)return null;
+    const view=new DataView(data.buffer,data.byteOffset,data.byteLength);
+    let end=-1;const floor=Math.max(0,data.length-65557);
+    for(let p=data.length-22;p>=floor;p--){if(view.getUint32(p,true)===0x06054b50&&p+22+view.getUint16(p+20,true)===data.length){end=p;break}}
+    if(end<0)return{entries:[],encrypted:false,complete:false,total:0};
+    const total=view.getUint16(end+10,true),offset=view.getUint32(end+16,true);
+    if(total===0xffff||offset===0xffffffff)return{entries:[],encrypted:false,complete:false,total};
+    const entries=[];let p=offset,encrypted=false,complete=true;
+    for(let i=0;i<Math.min(total,3000);i++){
+      if(p+46>data.length||view.getUint32(p,true)!==0x02014b50){complete=false;break}
+      const flags=view.getUint16(p+8,true),compressed=view.getUint32(p+20,true),uncompressed=view.getUint32(p+24,true);
+      const nameLen=view.getUint16(p+28,true),extraLen=view.getUint16(p+30,true),commentLen=view.getUint16(p+32,true);
+      if(p+46+nameLen+extraLen+commentLen>data.length){complete=false;break}
+      const decoder=new TextDecoder(flags&0x800?'utf-8':'latin1');
+      const name=decoder.decode(data.subarray(p+46,p+46+nameLen));
+      entries.push({name,compressed,uncompressed});if(flags&1)encrypted=true;
+      p+=46+nameLen+extraLen+commentLen;
+    }
+    return{entries,encrypted,complete:complete&&entries.length===total,total};
+  }
+  function analyze(file,bytes,header,archiveBytes){
     const findings=[],name=file.name.toLowerCase(),ext=extension(name);
     const add=(level,title,detail)=>findings.push({level,title,detail});
     const dangerous=['exe','dll','scr','com','msi','bat','cmd','ps1','psm1','vbs','vbe','js','jse','hta','jar','reg','iso','apk','lnk','url','cpl'];
     if(/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|txt)\.(exe|dll|scr|com|bat|cmd|ps1|vbs|js|hta)$/i.test(file.name))add('high','Deceptive double extension','The name looks like a document or image but ends with a file type that can run code.');
     if(dangerous.includes(ext))add('warn','Executable or script file type','This file type may run code or change your device when opened. Only use it if you expected it and trust its source.');
     if(['docm','xlsm','pptm'].includes(ext))add('warn','Macro-enabled Office document','This document format can contain macros. Do not enable macros unless you fully trust the source.');
-    if(['zip','rar','7z','iso'].includes(ext))add('info','Archive or disk image','This check does not unpack archive contents. Files inside have not been scanned.');
+    if(['rar','7z','iso'].includes(ext))add('info','Archive or disk image','This prototype does not inspect the contents of this archive or disk image.');
     if(['html','htm','svg'].includes(ext)&&(/<script\b|onload\s*=|javascript:/i.test(text)))add('warn','Active web content','This web document contains script or event-handler content that can run when opened in a browser.');
     const match=header.match(/Windows executable|Linux executable|Apple executable/);
     const expected={pdf:/^PDF/,png:/^PNG/,jpg:/^JPEG/,jpeg:/^JPEG/,gif:/^GIF/,exe:/^Windows/,dll:/^Windows/,scr:/^Windows/,zip:/^ZIP/,docx:/^ZIP/,xlsx:/^ZIP/,pptx:/^ZIP/};
     if(expected[ext]&&!expected[ext].test(header))add('warn','File extension and header do not match','The file contents do not begin with the usual signature for .'+ext+'. This can happen with mislabeled or disguised files.');
     if(match&&!['exe','dll','scr','com','msi'].includes(ext))add('high','Executable content under another extension','The file header identifies a program, while its filename does not use a typical executable extension.');
     if(bytes.length>=5&&bytes[0]===0x4d&&bytes[1]===0x5a&&bytes.length<128)add('warn','Unusually short executable header','The file starts like a Windows program but is unusually small. It may be incomplete or specially crafted.');
+    const zip=inspectZip(archiveBytes);
+    if(zip){
+      add('info','Archive directory inspected','Read '+zip.entries.length+' of '+zip.total+' entry names. File contents were not extracted or executed.');
+      const risky=zip.entries.filter(e=>/\.(?:exe|dll|scr|com|msi|bat|cmd|ps1|vbs|js|hta|jar|lnk)$/i.test(e.name));
+      if(risky.length)add('warn','Executable or script inside archive',risky.slice(0,4).map(e=>e.name).join(', ')+(risky.length>4?' and '+(risky.length-4)+' more':'')+'. Inspect these entries carefully before extracting.');
+      if(zip.entries.some(e=>/vbaProject\.bin/i.test(e.name)))add('warn','Office macro project inside archive','The archive directory contains a VBA project marker.');
+      if(zip.encrypted)add('warn','Encrypted archive entries','Some archive entries are encrypted, so their contents cannot be inspected here.');
+      if(zip.entries.some(e=>/(?:^|\/)\.\.(?:\/|$)/.test(e.name)||/^(?:\/|[A-Za-z]:\\)/.test(e.name)))add('warn','Unusual archive path','An entry uses an absolute or parent-directory path. Do not extract it without trusted security software.');
+      const oversized=zip.entries.some(e=>e.uncompressed>100*1024*1024||(e.uncompressed>20*1024*1024&&e.compressed>0&&e.uncompressed/e.compressed>100));
+      if(oversized)add('warn','Extreme archive expansion size','An entry expands to an unusually large size. Avoid extracting it on a device with limited storage.');
+      if(!zip.complete)add('info','Archive listing may be incomplete','This archive uses a layout or size that this lightweight directory reader cannot fully inspect.');
+    }
     const text=new TextDecoder('latin1').decode(bytes).toLowerCase();
     if(text.includes('eicar-standard-antivirus-test-file'))add('high','Recognized antivirus test pattern','This file contains the EICAR test string used to check antivirus detection. It is a harmless test pattern, not proof of malware.');
     if(/powershell(?:\.exe)?[^\r\n]{0,120}-(?:enc|encodedcommand)\b|frombase64string\s*\(|wscript\.shell|createobject\s*\(\s*["']wscript\.shell|mshta(?:\.exe)?\s+https?:|rundll32(?:\.exe)?[^\r\n]{0,100}javascript:/i.test(text))add('high','Suspicious command or script pattern','A pattern associated with encoded commands or script-based execution was found. This needs expert review.');
@@ -121,7 +154,7 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
     choose.disabled=true;
     try{
       const bytes=await file.arrayBuffer(),all=new Uint8Array(bytes),sample=all.subarray(0,Math.min(all.length,sampleBytes));
-      const header=magicType(sample),findings=analyze(file,sample,header);
+      const header=magicType(sample),findings=analyze(file,sample,header,all);
       let sha='Unavailable in this browser';try{sha=await hash(bytes)}catch{}
       renderResult(file,header,findings,sha);
       recent.unshift({name:file.name,size:file.size,level:findings.some(f=>f.level==='high')?'high':findings.some(f=>f.level==='warn')?'warn':'clear',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
@@ -134,7 +167,8 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
     const verdict=high?'high':warn?'warn':'clear';
     const label=high?'High-risk indicators':warn?'Review recommended':'No obvious warning signs';
     const summary=high?'This file has one or more strong warning indicators. Do not open it unless a trusted security professional verifies it.':warn?'One or more features deserve a closer look. If you were not expecting this file, do not open it.':'The basic checks found no known warning indicators. A clean result does not prove a file is safe.';
-    result.innerHTML='<div class="result-head"><div class="result-file"><b>'+esc(file.name)+'</b><span>'+formatSize(file.size)+' · '+esc(file.type||'Unknown MIME type')+' · Detected: '+esc(header)+'</span></div><span class="verdict '+verdict+'">'+label+'</span></div><p class="result-summary">'+summary+'</p><div class="finding-list">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div><b>'+esc(f.title)+'</b>'+esc(f.detail)+'</div></div>').join('')+'</div><div class="hashbox"><span>SHA-256 fingerprint</span><div class="hashline"><code id="hashValue">'+sha+'</code><button class="copy" id="copyHash" type="button">Copy</button></div></div><p class="disclaimer">This is a basic heuristic check, not a malware verdict. It does not unpack archives, inspect every file format, or compare the file with a threat intelligence database. Keep your operating system antivirus enabled.</p>';
+    const next=high?'Do not open or extract it. Ask a trusted security professional to review it, and report where you received it.':warn?'If you were not expecting this file, leave it unopened. Verify the sender through a separate trusted channel or scan it with your device security software.':'Keep your device security software on and only open files from sources you trust.';
+    result.innerHTML='<div class="result-head"><div class="result-file"><b>'+esc(file.name)+'</b><span>'+formatSize(file.size)+' · '+esc(file.type||'Unknown MIME type')+' · Detected: '+esc(header)+'</span></div><span class="verdict '+verdict+'">'+label+'</span></div><p class="result-summary">'+summary+'</p><div class="finding-list">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div><b>'+esc(f.title)+'</b>'+esc(f.detail)+'</div></div>').join('')+'</div><div class="privacy-strip" style="margin-top:12px"><span><b>Suggested next step:</b> '+esc(next)+'</span></div><div class="hashbox"><span>SHA-256 fingerprint</span><div class="hashline"><code id="hashValue">'+sha+'</code><button class="copy" id="copyHash" type="button">Copy</button></div></div><p class="disclaimer">This is a basic heuristic check, not a malware verdict. It does not unpack archives, inspect every file format, or compare the file with a threat intelligence database. Keep your operating system antivirus enabled.</p>';
     result.classList.add('show');
     document.getElementById('copyHash').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sha);notify('SHA-256 copied.')}catch{notify('Copy is unavailable; select the hash to copy it.')}});
   }
