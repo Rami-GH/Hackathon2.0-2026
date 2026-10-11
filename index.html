@@ -65,7 +65,7 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
 (() => {
   const input=document.getElementById('fileInput'),folderInput=document.getElementById('folderInput'),drop=document.getElementById('drop'),choose=document.getElementById('chooseBtn'),folderBtn=document.getElementById('folderBtn');
   const result=document.getElementById('result'),toast=document.getElementById('toast'),recentList=document.getElementById('recentList'),hashInput=document.getElementById('hashInput'),hashResult=document.getElementById('hashResult');
-  let recent=[],toastTimer,scanning=false,dragDepth=0;
+  let recent=[],sessionHashes=[],toastTimer,scanning=false,dragDepth=0;
   const maxBytes=50*1024*1024,sampleBytes=5*1024*1024,maxBatch=200;
   function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),3000)}
   function formatSize(n){if(n<1024)return n+' B';if(n<1048576)return(n/1024).toFixed(1)+' KB';return(n/1048576).toFixed(2)+' MB'}
@@ -84,13 +84,13 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
   document.getElementById('menu').addEventListener('click',()=>document.getElementById('side').classList.toggle('open'));
   document.getElementById('scanNav').addEventListener('click',()=>{document.getElementById('side').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})});
   document.getElementById('recentNav').addEventListener('click',()=>{document.getElementById('side').classList.remove('open');document.getElementById('recentSection').scrollIntoView({behavior:'smooth',block:'center'})});
-  document.getElementById('clearRecent').addEventListener('click',()=>{recent=[];renderRecent();notify('Recent checks cleared from this session.')});
+  document.getElementById('clearRecent').addEventListener('click',()=>{recent=[];sessionHashes=[];renderRecent();notify('Recent checks and local hash history cleared from this session.')});
   document.getElementById('checkHash').addEventListener('click',checkHash);
   hashInput.addEventListener('keydown',e=>{if(e.key==='Enter')checkHash()});
   async function checkHash(){
     const value=hashInput.value.trim().toLowerCase();
     if(!/^[a-f0-9]{64}$/.test(value)){hashResult.className='hash-result bad';hashResult.textContent='Enter a 64-character SHA-256 fingerprint using letters A–F and numbers 0–9.';return}
-    const previous=recent.find(item=>item.sha&&item.sha.toLowerCase()===value);
+    const previous=sessionHashes.find(item=>item.sha&&item.sha.toLowerCase()===value);
     if(previous){hashResult.className='hash-result match';hashResult.textContent='Matches a file checked in this tab: '+previous.name+' ('+(previous.level==='high'?'warning indicators found':previous.level==='warn'?'review recommended':'no obvious warning signs')+').';return}
     try{
       const testParts=['X5O!P%@AP[4\\PZX54(P^)7CC)7}$','EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'];
@@ -197,7 +197,8 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
       let sha='Unavailable in this browser';try{sha=await hash(buffer)}catch{}
       renderResult(file,header,findings,sha);
       const level=findings.some(f=>f.level==='high')?'high':findings.some(f=>f.level==='warn')?'warn':'clear';
-      recent.unshift({name:file.name,size:file.size,level,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),sha});
+      const record={name:file.name,size:file.size,level,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),sha};
+      sessionHashes.unshift(record);sessionHashes=sessionHashes.slice(0,1000);recent.unshift(record);
       recent=recent.slice(0,5);renderRecent();return true;
     }catch(err){notify(file.name+': '+(err.message||'could not be checked'));return false}
   }
