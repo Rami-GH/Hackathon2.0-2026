@@ -14,9 +14,11 @@ Open `index.html` in a modern browser. There is no build step, package installat
 - Reads ZIP central-directory entry names without extracting contents; can flag executable or script files, macro project markers, encrypted entries, unusual paths, and extreme expansion sizes.
 - Gives suggested next steps based on the findings.
 - Calculates a SHA-256 fingerprint for the full file when browser cryptography is available.
+- Scans multiple selected files or a selected folder sequentially (up to 200 files per batch, 50 MB per file).
+- Lets users paste a SHA-256 hash to compare against the harmless EICAR test fingerprint and hashes scanned in the current browser tab. This is a tiny local list, not a live threat database.
 - Shows findings and recent scan summaries in the current page session.
 
-The app does not upload the file, save the file, or execute it. Scan summaries exist only in page memory and disappear when the page is closed.
+The app does not upload the file, save the file, or execute it. Scan summaries and hash history exist only in page memory and disappear when the page is closed.
 
 ## Important limitations
 
