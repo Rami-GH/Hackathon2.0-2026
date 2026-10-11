@@ -18,6 +18,8 @@ Open `index.html` in a modern browser. There is no build step, package installat
 
 The app does not upload the file, save the file, or execute it. Scan summaries exist only in page memory and disappear when the page is closed.
 
+- Shows a 0–100 rule-weighted risk score with green, yellow, orange, and red bands; the score is an indicator, not a probability.
+
 ## Important limitations
 
 This is a **basic heuristic check**, not antivirus software and not a malware verdict. A warning can be a false positive, and a clean result does not prove a file is safe. The prototype does not extract or inspect archive contents, unpack encrypted files, inspect every file format or the full contents of every large file, use a malware signature database, or verify reputation with an external service. Archive checks only review directory metadata and can miss threats inside files. Keep your operating system security software enabled, and only open files from sources you trust.
