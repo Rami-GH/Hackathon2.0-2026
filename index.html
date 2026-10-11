@@ -76,99 +76,125 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
   document.getElementById('recentNav').addEventListener('click',()=>{document.getElementById('side').classList.remove('open');document.getElementById('recentSection').scrollIntoView({behavior:'smooth',block:'center'})});
   document.getElementById('clearRecent').addEventListener('click',()=>{recent=[];renderRecent();notify('Recent checks cleared from this session.')});
   function magicType(bytes){
-    if(bytes.length>=4&&bytes[0]===0x25&&bytes[1]===0x50&&bytes[2]===0x44&&bytes[3]===0x46)return'PDF document';
-    if(bytes.length>=8&&bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4e&&bytes[3]===0x47)return'PNG image';
+    const ascii=(start,length)=>String.fromCharCode(...bytes.subarray(start,start+length));
+    if(bytes.length>=4&&ascii(0,4)==='%PDF')return'PDF document';
+    if(bytes.length>=8&&bytes[0]===0x89&&ascii(1,3)==='PNG')return'PNG image';
     if(bytes.length>=3&&bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff)return'JPEG image';
-    if(bytes.length>=6&&String.fromCharCode(...bytes.slice(0,6)).match(/^GIF8[79]a$/))return'GIF image';
+    if(bytes.length>=6&&/^GIF8[79]a$/.test(ascii(0,6)))return'GIF image';
+    if(bytes.length>=2&&ascii(0,2)==='BM')return'BMP image';
+    if(bytes.length>=4&&((ascii(0,4)==='II*\0')||(ascii(0,4)==='MM\0*')))return'TIFF image';
+    if(bytes.length>=12&&ascii(0,4)==='RIFF'&&ascii(8,4)==='WEBP')return'WebP image';
+    if(bytes.length>=2&&bytes[0]===0&&bytes[1]===0&&bytes[2]===1&&bytes[3]===0)return'Windows icon';
     if(bytes.length>=2&&bytes[0]===0x4d&&bytes[1]===0x5a)return'Windows executable (PE)';
-    if(bytes.length>=4&&bytes[0]===0x7f&&bytes[1]===0x45&&bytes[2]===0x4c&&bytes[3]===0x46)return'Linux executable (ELF)';
-    if(bytes.length>=4&&((bytes[0]===0xfe&&bytes[1]===0xed&&bytes[2]===0xfa)||(bytes[0]===0xcf&&bytes[1]===0xfa)))return'Apple executable (Mach-O)';
-    if(bytes.length>=4&&bytes[0]===0x50&&bytes[1]===0x4b)return'ZIP-based file';
-    if(bytes.length>=4&&bytes[0]===0x52&&bytes[1]===0x61&&bytes[2]===0x72&&bytes[3]===0x21)return'RAR archive';
-    if(bytes.length>=6&&String.fromCharCode(...bytes.slice(0,6))==='7z\xBC\xAF\x27\x1C')return'7-Zip archive';
+    if(bytes.length>=4&&bytes[0]===0x7f&&ascii(1,3)==='ELF')return'Linux executable (ELF)';
+    if(bytes.length>=4&&((bytes[0]===0xfe&&bytes[1]===0xed&&bytes[2]===0xfa)||(bytes[0]===0xcf&&bytes[1]===0xfa)||(bytes[0]===0xca&&bytes[1]===0xfe)))return'Apple executable (Mach-O)';
+    if(bytes.length>=4&&ascii(0,4)==='PK\x03\x04')return'ZIP-based file';
+    if(bytes.length>=4&&ascii(0,4)==='Rar!')return'RAR archive';
+    if(bytes.length>=6&&ascii(0,6)==='7z\xBC\xAF\x27\x1C')return'7-Zip archive';
+    if(bytes.length>=2&&bytes[0]===0x1f&&bytes[1]===0x8b)return'GZIP archive';
+    if(bytes.length>=3&&ascii(0,3)==='BZh')return'BZIP2 archive';
+    if(bytes.length>=6&&ascii(0,6)==='\xFD7zXZ\0')return'XZ archive';
+    if(bytes.length>=8&&ascii(0,8)==='SQLite format')return'SQLite database';
+    if(bytes.length>=8&&bytes[0]===0xd0&&bytes[1]===0xcf&&bytes[2]===0x11&&bytes[3]===0xe0)return'OLE compound document';
+    if(bytes.length>=5&&ascii(0,5)==='{\\rtf')return'Rich Text document';
+    if(bytes.length>=4&&ascii(0,4)==='OggS')return'Ogg media';
+    if(bytes.length>=4&&ascii(0,4)==='fLaC')return'FLAC audio';
+    if(bytes.length>=4&&ascii(0,4)==='RIFF'&&ascii(8,4)==='WAVE')return'WAV audio';
+    if(bytes.length>=3&&ascii(0,3)==='ID3')return'MP3 audio';
+    if(bytes.length>=2&&bytes[0]===0xff&&(bytes[1]&0xe0)===0xe0)return'MP3 audio';
+    if(bytes.length>=8&&ascii(4,4)==='ftyp')return'ISO base media';
+    if(bytes.length>=4&&(ascii(0,4)==='FWS '||ascii(0,4)==='CWS '||ascii(0,4)==='ZWS '))return'SWF file';
+    if(bytes.length>=4&&bytes[0]===0x00&&bytes[1]===0x01&&bytes[2]===0x00&&bytes[3]===0x00)return'Truetype font';
+    if(bytes.length>=4&&ascii(0,4)==='OTTO')return'OpenType font';
+    if(bytes.length>=4&&ascii(0,4)==='wOFF')return'WOFF font';
+    if(bytes.length>=4&&ascii(0,4)==='wOF2')return'WOFF2 font';
     return'Unknown or plain-text header';
   }
   function extension(name){const m=name.toLowerCase().match(/\.([a-z0-9]{1,12})$/);return m?m[1]:''}
-  function inspectZip(data){
-    if(data.length<22||data[0]!==0x50||data[1]!==0x4b)return null;
-    const view=new DataView(data.buffer,data.byteOffset,data.byteLength);
-    let end=-1;const floor=Math.max(0,data.length-65557);
-    for(let p=data.length-22;p>=floor;p--){if(view.getUint32(p,true)===0x06054b50&&p+22+view.getUint16(p+20,true)===data.length){end=p;break}}
-    if(end<0)return{entries:[],encrypted:false,complete:false,total:0};
-    const total=view.getUint16(end+10,true),offset=view.getUint32(end+16,true);
-    if(total===0xffff||offset===0xffffffff)return{entries:[],encrypted:false,complete:false,total};
-    const entries=[];let p=offset,encrypted=false,complete=true;
-    for(let i=0;i<Math.min(total,3000);i++){
-      if(p+46>data.length||view.getUint32(p,true)!==0x02014b50){complete=false;break}
-      const flags=view.getUint16(p+8,true),compressed=view.getUint32(p+20,true),uncompressed=view.getUint32(p+24,true);
-      const nameLen=view.getUint16(p+28,true),extraLen=view.getUint16(p+30,true),commentLen=view.getUint16(p+32,true);
-      if(p+46+nameLen+extraLen+commentLen>data.length){complete=false;break}
-      const decoder=new TextDecoder(flags&0x800?'utf-8':'latin1');
-      const name=decoder.decode(data.subarray(p+46,p+46+nameLen));
-      entries.push({name,compressed,uncompressed});if(flags&1)encrypted=true;
-      p+=46+nameLen+extraLen+commentLen;
-    }
-    return{entries,encrypted,complete:complete&&entries.length===total,total};
+  function byteEntropy(bytes){
+    if(!bytes.length)return 0;const counts=new Uint32Array(256);
+    for(let i=0;i<bytes.length;i++)counts[bytes[i]]++;
+    let entropy=0;for(const count of counts){if(count){const p=count/bytes.length;entropy-=p*Math.log2(p)}}
+    return entropy;
   }
   function analyze(file,bytes,header,archiveBytes){
-    const findings=[],name=file.name.toLowerCase(),ext=extension(name);
-    const add=(level,title,detail)=>findings.push({level,title,detail});
+    const findings=[],name=file.name.toLowerCase(),ext=extension(name),text=new TextDecoder('latin1').decode(bytes).toLowerCase();
+    const add=(level,title,detail,points)=>findings.push({level,title,detail,points:points===undefined?(level==='high'?60:level==='warn'?20:0):points});
     const dangerous=['exe','dll','scr','com','msi','bat','cmd','ps1','psm1','vbs','vbe','js','jse','hta','jar','reg','iso','apk','lnk','url','cpl'];
-    if(/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|txt)\.(exe|dll|scr|com|bat|cmd|ps1|vbs|js|hta)$/i.test(file.name))add('high','Deceptive double extension','The name looks like a document or image but ends with a file type that can run code.');
-    if(dangerous.includes(ext))add('warn','Executable or script file type','This file type may run code or change your device when opened. Only use it if you expected it and trust its source.');
-    if(['docm','xlsm','pptm'].includes(ext))add('warn','Macro-enabled Office document','This document format can contain macros. Do not enable macros unless you fully trust the source.');
+    const doubleExt=/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|txt)\.(exe|dll|scr|com|bat|cmd|ps1|vbs|js|hta)$/i.test(file.name);
+    if(doubleExt)add('high','Deceptive double extension','This file is named "'+file.name+'": it looks like a document or image, but the final .'+ext+' ending identifies a program or script.');
+    if(name.includes(String.fromCharCode(0x202e)))add('high','Right-to-left override in filename','A hidden direction-control character can make the displayed filename look different from its actual ending.');
+    if(dangerous.includes(ext))add('warn','Executable or script file type','Files ending in .'+ext+' can run code or change your device. Open only if you expected this file and trust its source.');
+    if(['docm','xlsm','pptm'].includes(ext))add('warn','Macro-enabled Office document','This Office format can run embedded macros. Do not enable macros unless you fully trust the source.');
     if(['rar','7z','iso'].includes(ext))add('info','Archive or disk image','This prototype does not inspect the contents of this archive or disk image.');
     if(['html','htm','svg'].includes(ext)&&(/<script\b|onload\s*=|javascript:/i.test(text)))add('warn','Active web content','This web document contains script or event-handler content that can run when opened in a browser.');
-    const match=header.match(/Windows executable|Linux executable|Apple executable/);
-    const expected={pdf:/^PDF/,png:/^PNG/,jpg:/^JPEG/,jpeg:/^JPEG/,gif:/^GIF/,exe:/^Windows/,dll:/^Windows/,scr:/^Windows/,zip:/^ZIP/,docx:/^ZIP/,xlsx:/^ZIP/,pptx:/^ZIP/};
-    if(expected[ext]&&!expected[ext].test(header))add('warn','File extension and header do not match','The file contents do not begin with the usual signature for .'+ext+'. This can happen with mislabeled or disguised files.');
-    if(match&&!['exe','dll','scr','com','msi'].includes(ext))add('high','Executable content under another extension','The file header identifies a program, while its filename does not use a typical executable extension.');
-    if(bytes.length>=5&&bytes[0]===0x4d&&bytes[1]===0x5a&&bytes.length<128)add('warn','Unusually short executable header','The file starts like a Windows program but is unusually small. It may be incomplete or specially crafted.');
+    const expected={
+      pdf:'PDF document',png:'PNG image',jpg:'JPEG image',jpeg:'JPEG image',gif:'GIF image',bmp:'BMP image',tif:'TIFF image',tiff:'TIFF image',webp:'WebP image',ico:'Windows icon',
+      exe:'Windows executable (PE)',dll:'Windows executable (PE)',scr:'Windows executable (PE)',com:'Windows executable (PE)',zip:'ZIP-based file',docx:'ZIP-based file',xlsx:'ZIP-based file',pptx:'ZIP-based file',odt:'ZIP-based file',ods:'ZIP-based file',odp:'ZIP-based file',epub:'ZIP-based file',jar:'ZIP-based file',apk:'ZIP-based file',
+      rar:'RAR archive',7z:'7-Zip archive',gz:'GZIP archive',tgz:'GZIP archive',bz2:'BZIP2 archive',xz:'XZ archive',sqlite:'SQLite database',db:'SQLite database',doc:'OLE compound document',xls:'OLE compound document',ppt:'OLE compound document',rtf:'Rich Text document',ogg:'Ogg media',oga:'Ogg media',ogv:'Ogg media',flac:'FLAC audio',wav:'WAV audio',mp3:'MP3 audio',mp4:'ISO base media',m4v:'ISO base media',mov:'ISO base media',swf:'SWF file',ttf:'Truetype font',otf:'OpenType font',woff:'WOFF font',woff2:'WOFF2 font'
+    };
+    if(expected[ext]&&expected[ext]!==header)add('warn','File extension and header do not match','The name ends in .'+ext+', but its opening bytes look like '+header+'. A renamed or damaged file can cause this; verify the source before opening.');
+    const isExecutable=/Windows executable|Linux executable|Apple executable/.test(header);
+    if(isExecutable&&!['exe','dll','scr','com','msi'].includes(ext))add('high','Executable content under another extension','The opening bytes identify a program, but the filename ends in .'+(ext||'no extension')+'. This can disguise an executable.');
+    if(isExecutable&&bytes.length<128)add('warn','Unusually short executable','The file starts like a program but is unusually small; it may be incomplete or specially crafted.');
     const zip=inspectZip(archiveBytes);
     if(zip){
       add('info','Archive directory inspected','Read '+zip.entries.length+' of '+zip.total+' entry names. File contents were not extracted or executed.');
       const risky=zip.entries.filter(e=>/\.(?:exe|dll|scr|com|msi|bat|cmd|ps1|vbs|js|hta|jar|lnk)$/i.test(e.name));
       if(risky.length)add('warn','Executable or script inside archive',risky.slice(0,4).map(e=>e.name).join(', ')+(risky.length>4?' and '+(risky.length-4)+' more':'')+'. Inspect these entries carefully before extracting.');
-      if(zip.entries.some(e=>/vbaProject\.bin/i.test(e.name)))add('warn','Office macro project inside archive','The archive directory contains a VBA project marker.');
+      if(zip.entries.some(e=>/vbaProject\.bin/i.test(e.name)))add('warn','Office macro project inside archive','Found a vbaProject.bin entry name, which indicates an embedded VBA macro project.');
       if(zip.encrypted)add('warn','Encrypted archive entries','Some archive entries are encrypted, so their contents cannot be inspected here.');
-      if(zip.entries.some(e=>/(?:^|\/)\.\.(?:\/|$)/.test(e.name)||/^(?:\/|[A-Za-z]:\\)/.test(e.name)))add('warn','Unusual archive path','An entry uses an absolute or parent-directory path. Do not extract it without trusted security software.');
-      const oversized=zip.entries.some(e=>e.uncompressed>100*1024*1024||(e.uncompressed>20*1024*1024&&e.compressed>0&&e.uncompressed/e.compressed>100));
-      if(oversized)add('warn','Extreme archive expansion size','An entry expands to an unusually large size. Avoid extracting it on a device with limited storage.');
+      if(zip.entries.some(e=>/(?:^|\/)\.\.(?:\/|$)/.test(e.name)||/^(?:\/|[A-Za-z]:\\)/.test(e.name)))add('warn','Unusual archive path','An entry uses an absolute or parent-directory path. Avoid extracting it without trusted security software.');
+      if(zip.entries.some(e=>e.uncompressed>100*1024*1024||(e.uncompressed>20*1024*1024&&e.compressed>0&&e.uncompressed/e.compressed>100)))add('warn','Extreme archive expansion size','An entry expands to an unusually large size. Avoid extracting it on a device with limited storage.');
       if(!zip.complete)add('info','Archive listing may be incomplete','This archive uses a layout or size that this lightweight directory reader cannot fully inspect.');
     }
-    const text=new TextDecoder('latin1').decode(bytes).toLowerCase();
-    if(text.includes('eicar-standard-antivirus-test-file'))add('high','Recognized antivirus test pattern','This file contains the EICAR test string used to check antivirus detection. It is a harmless test pattern, not proof of malware.');
-    if(/powershell(?:\.exe)?[^\r\n]{0,120}-(?:enc|encodedcommand)\b|frombase64string\s*\(|wscript\.shell|createobject\s*\(\s*["']wscript\.shell|mshta(?:\.exe)?\s+https?:|rundll32(?:\.exe)?[^\r\n]{0,100}javascript:/i.test(text))add('high','Suspicious command or script pattern','A pattern associated with encoded commands or script-based execution was found. This needs expert review.');
-    if(/(?:eval\s*\(\s*atob\s*\(|document\.write\s*\(\s*atob\s*\(|fromcharcode\s*\(\s*atob\s*\()/i.test(text))add('warn','Obfuscated script pattern','The file contains a script pattern that can hide what code will do when opened.');
-    if(ext==='pdf'&&/\/(?:javascript|js|openaction|launch|embeddedfile)\b/i.test(text))add('warn','Active PDF feature marker','The PDF contains a JavaScript, launch, or embedded-file marker. These features can be legitimate, but deserve caution.');
-    if(/vbaProject\.bin/i.test(text))add('warn','Office macro project marker','The archive directory contains a marker associated with embedded Office macros.');
-    if(!findings.length)add('info','No obvious warning signs found','The checks performed did not identify a known warning pattern. This does not certify the file as safe.');
+    if(text.includes('eicar-standard-antivirus-test-file'))add('info','Antivirus test pattern','The harmless EICAR test string is present. This checks antivirus response and is not a real malware sample.',0);
+    if(/powershell(?:\.exe)?[^\r\n]{0,120}-(?:enc|encodedcommand)\b|frombase64string\s*\(|wscript\.shell|createobject\s*\(\s*["']wscript\.shell|mshta(?:\.exe)?\s+https?:|rundll32(?:\.exe)?[^\r\n]{0,100}javascript:/i.test(text))add('high','Suspicious command pattern','Found a command pattern associated with encoded PowerShell or script-based execution. Do not run this file unless a trusted security professional verifies it.');
+    if(/\beval\s*\(|new\s+function\s*\(|(?:atob|fromcharcode)\s*\(/i.test(text))add('warn','Possible script obfuscation','This file uses dynamic code or decoding patterns that can hide what a script will do. These patterns can also appear in legitimate software.');
+    const scriptType=['js','jse','ps1','psm1','vbs','vbe','hta','html','htm','svg'].includes(ext);
+    if(scriptType&&/[a-z0-9+/]{160,}={0,2}/i.test(text))add('warn','Long encoded text block','A long Base64-like block appears in a script. Encoded data is not proof of malware, but can conceal commands.');
+    if(ext==='pdf'){
+      const markers=[...text.matchAll(/\/(?:javascript|js|openaction|launch|embeddedfile)\b/ig)].map(m=>m[0]).slice(0,5);
+      if(markers.length)add('warn','Active PDF feature markers','Found '+markers.join(', ')+'. These features can be legitimate, but unexpected PDFs with active actions deserve caution.');
+    }
+    if(/vbaProject\.bin/i.test(text))add('warn','Office macro project marker','The file contains a marker associated with an embedded Office macro project.');
+    const compressed=['zip','rar','7z','gz','tgz','bz2','xz','png','jpg','jpeg','gif','webp','mp3','mp4','m4v','mov','pdf'];
+    if(file.size>4096&&!compressed.includes(ext)){
+      const entropy=byteEntropy(bytes.subarray(0,Math.min(bytes.length,262144)));
+      if(entropy>=7.25)add('info','High byte entropy','A sample of this file is unusually dense or varied. Compression, encryption, and packed software can cause this too; it is not a malware verdict.',8);
+    }
+    if(!findings.length)add('info','No obvious warning signs','The checks performed did not identify a known warning pattern. This does not certify the file as safe.',0);
     return findings;
   }
   async function hash(bytes){if(!crypto.subtle)throw new Error('SHA-256 is unavailable in this browser context.');const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')}
   async function scan(file){
     result.classList.remove('show');
     if(file.size>maxBytes){notify('This prototype supports files up to 50 MB.');return}
-    document.getElementById('dropTitle').textContent='Checking file locally…';
-    document.getElementById('dropSub').textContent='Reading file bytes. Nothing is being uploaded or executed.';
-    choose.disabled=true;
+    choose.disabled=true;const demo=document.getElementById('demoBtn');if(demo)demo.disabled=true;
+    drop.classList.add('busy');document.getElementById('dropTitle').textContent='Reading file locally…';document.getElementById('dropSub').textContent='Nothing is being uploaded or executed.';
     try{
+      await new Promise(resolve=>requestAnimationFrame(resolve));
       const bytes=await file.arrayBuffer(),all=new Uint8Array(bytes),sample=all.subarray(0,Math.min(all.length,sampleBytes));
       const header=magicType(sample),findings=analyze(file,sample,header,all);
+      document.getElementById('dropTitle').textContent='Calculating SHA-256…';document.getElementById('dropSub').textContent='The fingerprint is calculated on this device.';
+      await new Promise(resolve=>requestAnimationFrame(resolve));
       let sha='Unavailable in this browser';try{sha=await hash(bytes)}catch{}
+      const risk=Math.min(100,findings.reduce((sum,f)=>sum+f.points,0));
       renderResult(file,header,findings,sha);
-      recent.unshift({name:file.name,size:file.size,level:findings.some(f=>f.level==='high')?'high':findings.some(f=>f.level==='warn')?'warn':'clear',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
-      recent=recent.slice(0,5);renderRecent();
+      recent.unshift({name:file.name,size:file.size,level:risk>=60?'high':risk>=20?'warn':'clear',risk,header,sha,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),findings:findings.map(f=>({level:f.level,title:f.title,detail:f.detail,points:f.points}))});
+      recent=recent.slice(0,50);renderRecent();
     }catch(err){notify(err.message||'The file could not be checked in this browser.')}
-    finally{document.getElementById('dropTitle').textContent='Drop a file here to check it';document.getElementById('dropSub').textContent='or choose a file from your device';choose.disabled=false}
+    finally{drop.classList.remove('busy');document.getElementById('dropTitle').textContent='Drop a file here to check it';document.getElementById('dropSub').textContent='or choose a file from your device';choose.disabled=false;if(demo)demo.disabled=false}
   }
   function renderResult(file,header,findings,sha){
-    const high=findings.some(f=>f.level==='high'),warn=findings.some(f=>f.level==='warn');
-    const verdict=high?'high':warn?'warn':'clear';
-    const label=high?'High-risk indicators':warn?'Review recommended':'No obvious warning signs';
-    const summary=high?'This file has one or more strong warning indicators. Do not open it unless a trusted security professional verifies it.':warn?'One or more features deserve a closer look. If you were not expecting this file, do not open it.':'The basic checks found no known warning indicators. A clean result does not prove a file is safe.';
-    const next=high?'Do not open or extract it. Ask a trusted security professional to review it, and report where you received it.':warn?'If you were not expecting this file, leave it unopened. Verify the sender through a separate trusted channel or scan it with your device security software.':'Keep your device security software on and only open files from sources you trust.';
-    result.innerHTML='<div class="result-head"><div class="result-file"><b>'+esc(file.name)+'</b><span>'+formatSize(file.size)+' · '+esc(file.type||'Unknown MIME type')+' · Detected: '+esc(header)+'</span></div><span class="verdict '+verdict+'">'+label+'</span></div><p class="result-summary">'+summary+'</p><div class="finding-list">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div><b>'+esc(f.title)+'</b>'+esc(f.detail)+'</div></div>').join('')+'</div><div class="privacy-strip" style="margin-top:12px"><span><b>Suggested next step:</b> '+esc(next)+'</span></div><div class="hashbox"><span>SHA-256 fingerprint</span><div class="hashline"><code id="hashValue">'+sha+'</code><button class="copy" id="copyHash" type="button">Copy</button></div></div><p class="disclaimer">This is a basic heuristic check, not a malware verdict. It does not unpack archives, inspect every file format, or compare the file with a threat intelligence database. Keep your operating system antivirus enabled.</p>';
+    const score=Math.min(100,findings.reduce((sum,f)=>sum+f.points,0));
+    const verdict=score>=60?'high':score>=20?'warn':'clear';
+    const label=verdict==='high'?'High risk':verdict==='warn'?'Suspicious':'Looks OK';
+    const icon=verdict==='high'?'!':verdict==='warn'?'!':'✓';
+    const summary=verdict==='high'?'Several strong warning signs were found. Do not open or extract this file.':verdict==='warn'?'One or more warning signs need a closer look. If the file was unexpected, leave it unopened.':'The checks found no obvious warning signs. This is not proof that the file is safe.';
+    const next=verdict==='high'?'Do not open or extract it. Delete it if you do not need it, or ask your IT/security team to review it.':verdict==='warn'?'Do not open it if you were not expecting it. Verify the sender another way or ask IT to review it.':'Keep device security software enabled and only open files from sources you trust.';
+    const pointsText=f=>f.points?'+'+f.points+' pts':'context';
+    result.innerHTML='<div class="result-hero '+verdict+'"><div class="result-verdict"><span class="verdict-symbol">'+icon+'</span><div><strong>'+label+'</strong><span>'+summary+'</span></div></div><div class="risk-score"><span>Heuristic risk score</span><b>'+score+'<small> / 100</small></b></div></div><div class="score-note">Score adds rule weights (high 60, warning 20, context 0–8), capped at 100. It is a transparent prototype estimate, not a probability.</div><div class="result-file"><b>'+esc(file.name)+'</b><span>'+formatSize(file.size)+' · '+esc(file.type||'Unknown MIME type')+' · Detected: '+esc(header)+'</span></div><div class="finding-list">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div class="finding-copy"><b>'+esc(f.title)+'</b><span>'+esc(f.detail)+'</span></div><span class="points">'+pointsText(f)+'</span></div>').join('')+'</div><div class="privacy-strip action-next"><span><b>Recommended action:</b> '+esc(next)+'</span></div><div class="hashbox"><span>SHA-256 fingerprint</span><div class="hashline"><code id="hashValue">'+esc(sha)+'</code><button class="copy" id="copyHash" type="button">Copy</button></div></div><p class="disclaimer">This is a basic heuristic check, not a malware verdict. It samples up to 5 MB for content patterns, does not extract archive contents, and has no live threat database. Keep your operating system antivirus enabled.</p>';
     result.classList.add('show');
     document.getElementById('copyHash').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sha);notify('SHA-256 copied.')}catch{notify('Copy is unavailable; select the hash to copy it.')}});
   }
