@@ -102,7 +102,7 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
     if(bytes.length>=2&&bytes[0]===0x1f&&bytes[1]===0x8b)return'GZIP archive';
     if(bytes.length>=3&&ascii(0,3)==='BZh')return'BZIP2 archive';
     if(bytes.length>=6&&ascii(0,6)==='\xFD7zXZ\0')return'XZ archive';
-    if(bytes.length>=8&&ascii(0,8)==='SQLite format')return'SQLite database';
+    if(bytes.length>=16&&ascii(0,16)==='SQLite format 3\\0')return'SQLite database';
     if(bytes.length>=8&&bytes[0]===0xd0&&bytes[1]===0xcf&&bytes[2]===0x11&&bytes[3]===0xe0)return'OLE compound document';
     if(bytes.length>=5&&ascii(0,5)==='{\\rtf')return'Rich Text document';
     if(bytes.length>=4&&ascii(0,4)==='OggS')return'Ogg media';
@@ -111,7 +111,7 @@ main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:
     if(bytes.length>=3&&ascii(0,3)==='ID3')return'MP3 audio';
     if(bytes.length>=2&&bytes[0]===0xff&&(bytes[1]&0xe0)===0xe0)return'MP3 audio';
     if(bytes.length>=8&&ascii(4,4)==='ftyp')return'ISO base media';
-    if(bytes.length>=4&&(ascii(0,4)==='FWS '||ascii(0,4)==='CWS '||ascii(0,4)==='ZWS '))return'SWF file';
+    if(bytes.length>=3&&(['FWS','CWS','ZWS'].includes(ascii(0,3))))return'SWF file';
     if(bytes.length>=4&&bytes[0]===0x00&&bytes[1]===0x01&&bytes[2]===0x00&&bytes[3]===0x00)return'Truetype font';
     if(bytes.length>=4&&ascii(0,4)==='OTTO')return'OpenType font';
     if(bytes.length>=4&&ascii(0,4)==='wOFF')return'WOFF font';
