@@ -94,11 +94,12 @@ main{min-width:0}.top{height:64px;background:#ffffffc7;border-bottom:1px solid v
   function analyze(file,bytes,header){
     const findings=[],name=file.name.toLowerCase(),ext=extension(name);
     const add=(level,title,detail)=>findings.push({level,title,detail});
-    const dangerous=['exe','dll','scr','com','msi','bat','cmd','ps1','vbs','vbe','js','jse','hta','jar','reg','iso','apk'];
+    const dangerous=['exe','dll','scr','com','msi','bat','cmd','ps1','psm1','vbs','vbe','js','jse','hta','jar','reg','iso','apk','lnk','url','cpl'];
     if(/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|txt)\.(exe|dll|scr|com|bat|cmd|ps1|vbs|js|hta)$/i.test(file.name))add('high','Deceptive double extension','The name looks like a document or image but ends with a file type that can run code.');
     if(dangerous.includes(ext))add('warn','Executable or script file type','This file type may run code or change your device when opened. Only use it if you expected it and trust its source.');
     if(['docm','xlsm','pptm'].includes(ext))add('warn','Macro-enabled Office document','This document format can contain macros. Do not enable macros unless you fully trust the source.');
     if(['zip','rar','7z','iso'].includes(ext))add('info','Archive or disk image','This check does not unpack archive contents. Files inside have not been scanned.');
+    if(['html','htm','svg'].includes(ext)&&(/<script\b|onload\s*=|javascript:/i.test(text)))add('warn','Active web content','This web document contains script or event-handler content that can run when opened in a browser.');
     const match=header.match(/Windows executable|Linux executable|Apple executable/);
     const expected={pdf:/^PDF/,png:/^PNG/,jpg:/^JPEG/,jpeg:/^JPEG/,gif:/^GIF/,exe:/^Windows/,dll:/^Windows/,scr:/^Windows/,zip:/^ZIP/,docx:/^ZIP/,xlsx:/^ZIP/,pptx:/^ZIP/};
     if(expected[ext]&&!expected[ext].test(header))add('warn','File extension and header do not match','The file contents do not begin with the usual signature for .'+ext+'. This can happen with mislabeled or disguised files.');
@@ -122,7 +123,8 @@ main{min-width:0}.top{height:64px;background:#ffffffc7;border-bottom:1px solid v
     choose.disabled=true;
     try{
       const bytes=await file.arrayBuffer(),all=new Uint8Array(bytes),sample=all.subarray(0,Math.min(all.length,sampleBytes));
-      const header=magicType(sample),findings=analyze(file,sample,header),sha=await hash(bytes);
+      const header=magicType(sample),findings=analyze(file,sample,header);
+      let sha='Unavailable in this browser';try{sha=await hash(bytes)}catch{}
       renderResult(file,header,findings,sha);
       recent.unshift({name:file.name,size:file.size,level:findings.some(f=>f.level==='high')?'high':findings.some(f=>f.level==='warn')?'warn':'clear',time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
       recent=recent.slice(0,5);renderRecent();
