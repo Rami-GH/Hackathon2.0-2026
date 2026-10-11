@@ -1,24 +1,23 @@
-# Aman — Digital trust, built together
+# Aman — Local file safety check
 
-A responsive web prototype for the **Digital Trust & Cyber-Secure Nation** theme. Aman brings public service health, cyber safety guidance, and incident reporting into one calm, accessible experience.
+Aman is a browser-based file inspection prototype for the **Digital Trust & Cyber-Secure Nation** theme. Choose or drop in a file to check it locally for selected warning signs before opening it.
 
 ## Run it
 
-Open `index.html` in a browser. The prototype is a single self-contained page and does not require a build step or package installation.
+Open `index.html` in a modern browser. There is no build step, package installation, backend, or API key.
 
-## What’s included
+## What the check does
 
-- **Overview:** national service health, resilience indicators, community safety actions, and trust updates.
-- **My cyber safety:** six practical account, message, and device security actions, with progress saved in the current browser.
-- **Service status:** expanded status overview and service continuity information.
-- **Report an issue:** an interactive form that demonstrates the reporting flow.
-- **Safety mini-check:** a short phishing awareness question and scam warning signs.
-- Responsive layout for desktop and mobile screens.
+- Reads a file selected by the user in the browser, with a 50 MB size limit.
+- Compares common file extensions with recognizable file headers.
+- Flags deceptive double extensions, executable and macro-enabled file types, and selected suspicious script or PDF patterns.
+- Calculates a SHA-256 fingerprint for the full file when browser cryptography is available.
+- Shows findings and recent scan summaries in the current page session.
 
-## Prototype boundaries
+The app does not upload the file, save the file, or execute it. Scan summaries exist only in page memory and disappear when the page is closed.
 
-This is a front-end concept, not a connected government service. Service metrics, threat counts, timestamps, and notices are illustrative. The report form does not transmit or persist reports. Checklist progress is stored locally in browser storage. Before production, connect these experiences to verified service-status feeds, authenticated reporting and response workflows, accessibility and localization standards, and approved public communications.
+## Important limitations
 
-## Design intent
+This is a **basic heuristic check**, not antivirus software and not a malware verdict. A warning can be a false positive, and a clean result does not prove a file is safe. The prototype does not unpack archives, inspect every file format or the full contents of every large file, use a malware signature database, or verify reputation with an external service. Keep your operating system security software enabled, and only open files from sources you trust.
 
-Build public confidence through clear explanations, useful safety actions, transparent status information, and careful handling of sensitive reports.
+For production malware protection, integrate a maintained scanning engine or trusted threat-intelligence service on a secure backend, with explicit consent, privacy controls, safe file handling, and clear reporting of scan coverage.
