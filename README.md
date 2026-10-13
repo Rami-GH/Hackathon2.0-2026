@@ -8,6 +8,8 @@ Open `index.html` in a modern browser. There is no build step, package installat
 
 ## What the check does
 
+- Includes a separate local-only message scam clue checker for payment pressure, suspicious links, and requests for sensitive information. It does not verify senders or determine whether a fine is genuine.
+
 - Reads a file selected by the user in the browser, with a 50 MB size limit.
 - Compares common file extensions with recognizable file headers.
 - Flags deceptive double extensions, executable and macro-enabled file types, and selected suspicious script or PDF patterns.
