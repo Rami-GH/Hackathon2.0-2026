@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10231f">
+<meta name="description" content="Aman is a local demo workspace for reviewing suspected government-channel impersonation, with message and file safety tools.">
+<title>Aman — Government channel integrity</title>
+<style>:root{--bg:#f1efea;--paper:#fbfaf6;--ink:#282e2a;--muted:#777d75;--line:rgba(42,52,44,.09);--forest:#263f32;--green:#426c4c;--mint:#d5e5ce;--lime:#c9dfb4;--gold:#a97127;--amber:#fbf0db;--red:#a64d40;--rose:#f9eae6;--soft:#edf1e8;--shadow:0 2px 4px rgba(24,36,27,.025),0 12px 28px rgba(24,36,27,.035)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 'Trebuchet MS',Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}.shell{min-height:100vh;display:grid;grid-template-columns:230px 1fr}.side{background:var(--forest);color:#edf2ec;min-height:100vh;height:100vh;position:sticky;top:0;padding:26px 15px 18px;display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:10px;padding:0 10px 36px}.mark{width:35px;height:35px;border-radius:8px;background:var(--lime);color:var(--forest);display:grid;place-items:center}.mark svg{width:20px}.brand b{font:400 23px/1 Georgia,'Times New Roman',serif;letter-spacing:-.7px}.brand small{display:block;color:#b5c2b4;font-size:9px;letter-spacing:.8px;margin-top:4px}.section-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:#a9b8aa;padding:0 11px 9px}.nav{display:grid;gap:5px}.nav button{border:0;background:none;color:#d0d8cf;text-align:left;padding:10px 11px;border-radius:5px;font-size:12px;display:flex;align-items:center;gap:11px}.nav button:hover,.nav button.selected{background:#345342;color:#f4f5ed}.nav button.selected{font-weight:700}.nav svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.side-bottom{margin-top:auto}.privacy-card{margin:0 4px 14px;border:1px solid #4e6553;background:#2c4937;border-radius:5px;padding:14px 12px}.privacy-card .shield{color:#d3e0bd;display:flex;align-items:center;gap:7px;font-weight:700;font-size:11px}.shield svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8}.privacy-card p{font-size:10px;line-height:1.55;color:#d2dbce;margin:8px 0 0}.side-foot{border-top:1px solid #4a5d4c;padding:13px 8px 0;font-size:10px;color:#c3cfc0;line-height:1.6}
+main{min-width:0}.top{height:68px;background:rgba(251,250,246,.8);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(24px,5vw,68px)}.crumb{color:var(--muted);font-size:11px}.crumb b{color:var(--ink);font-weight:700}.top-right{display:flex;align-items:center;gap:10px}.local-tag{display:flex;align-items:center;gap:7px;background:#f4f6ef;color:#45664b;border:1px solid rgba(60,90,62,.12);border-radius:4px;padding:6px 10px;font-size:10px;font-weight:600}.local-tag i{width:7px;height:7px;border-radius:50%;background:#668d5b}.avatar{width:29px;height:29px;border-radius:50%;background:#e1e5d8;color:#405b42;display:grid;place-items:center;font-size:9px;font-weight:700}.content{max-width:1280px;margin:auto;padding:48px clamp(24px,5vw,68px) 64px}.eyebrow{font-size:10px;letter-spacing:1.55px;text-transform:uppercase;color:#52694e;font-weight:700;display:flex;align-items:center;gap:9px}.eyebrow:before{content:"";width:22px;height:1px;background:#7e9a70}.hero{margin:15px 0 34px;display:flex;justify-content:space-between;align-items:flex-end;gap:22px}.hero h1{font:400 clamp(36px,4.2vw,53px)/1.03 Georgia,'Times New Roman',serif;letter-spacing:-1.55px;margin:0;max-width:700px}.hero p{font-size:13px;color:#70766f;line-height:1.7;margin:12px 0 0;max-width:570px}.version{border:1px solid var(--line);background:var(--paper);border-radius:3px;padding:8px 10px;font-size:10px;color:#60685f;white-space:nowrap}
+.columns{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(235px,.7fr);gap:38px;align-items:start}.card{background:var(--paper);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow)}.scan-card{padding:24px 24px 22px}.card-title{display:flex;align-items:flex-start;gap:13px}.title-icon{width:35px;height:35px;border-radius:5px;background:#e9eee4;color:#4c6b4c;display:grid;place-items:center;flex-shrink:0}.title-icon svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}.card-title h2{font:700 16px/1.25 'Trebuchet MS',Arial,sans-serif;letter-spacing:-.1px;margin:1px 0 0}.card-title p{font-size:11px;color:var(--muted);margin:5px 0 0}
+.drop{margin-top:22px;border:1px dashed #98ad8e;background:#f7f8f2;border-radius:4px;min-height:235px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;transition:.18s;outline:none}.drop.drag{background:#eef2e8;border-color:#526f4a;transform:scale(1.003)}.upload-icon{width:43px;height:43px;border-radius:50%;background:#e8ecdf;color:#496349;display:grid;place-items:center;margin-bottom:13px}.upload-icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.drop strong{font-size:14px}.drop p{font-size:11px;color:var(--muted);margin:4px 0 13px}.button{border:1px solid rgba(44,61,43,.15);background:var(--paper);color:var(--ink);font-size:11px;font-weight:700;padding:9px 13px;border-radius:3px;display:inline-flex;align-items:center;gap:7px}.button:hover{box-shadow:0 3px 10px rgba(30,44,31,.08)}.button-primary{background:#3d6042;border-color:#3d6042;color:white}.button-primary:hover{background:#314f37}.button:disabled{opacity:.6;cursor:wait}.button svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8}.limit{font-size:9px;color:#858980;margin-top:11px}.file-input{display:none}.privacy-strip{margin-top:14px;padding:8px 2px;border-radius:0;background:transparent;color:#626f62;font-size:10px;line-height:1.55;display:flex;gap:8px;border-top:1px solid var(--line)}.privacy-strip svg{width:14px;height:14px;stroke:#526e4d;fill:none;stroke-width:1.8;flex-shrink:0;margin-top:2px}.result{display:none;margin-top:17px;border-top:1px solid var(--line);padding-top:17px}.result.show{display:block}.result-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.result-file{min-width:0}.result-file b{display:block;font-size:12px;overflow-wrap:anywhere}.result-file span{display:block;color:var(--muted);font-size:10px;margin-top:3px}.verdict{border-radius:3px;padding:5px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.55px;font-weight:800;white-space:nowrap}.verdict.warn{color:#805919;background:var(--amber)}.verdict.high{color:#963e33;background:var(--rose)}.verdict.clear{color:#3e6243;background:#e9eee3}.result-summary{font-size:11px;color:#606a61;line-height:1.6;margin:13px 0}.finding-list{display:grid;gap:7px}.finding{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:3px;padding:10px 11px;font-size:10px;line-height:1.5}.finding .badge{width:17px;height:17px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800;flex-shrink:0}.finding.high .badge{color:#a33f33;background:#ffebe7}.finding.warn .badge{color:#936315;background:#fff2d2}.finding.info .badge{color:#4e6c5b;background:#edf1e8}.finding b{display:block;font-size:10px;margin-bottom:2px}.hashbox{margin-top:13px;background:#f2f2eb;border-radius:3px;padding:11px}.hashbox span{font-size:9px;text-transform:uppercase;letter-spacing:.8px;color:#727970;display:block}.hashline{display:flex;align-items:flex-start;gap:8px;margin-top:5px}.hashline code{font:10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;overflow-wrap:anywhere;flex:1;color:#394a3a}.copy{border:1px solid var(--line);background:var(--paper);border-radius:3px;padding:4px 7px;color:#536253;font-size:9px}.disclaimer{font-size:10px;color:#737a72;line-height:1.6;margin:12px 0 0}
+.right-col{display:grid;gap:21px}.side-panel{padding:2px 0 17px;border:0;border-bottom:1px solid rgba(42,52,44,.14);border-radius:0;background:transparent;box-shadow:none}.side-panel h3{font:700 13px/1.3 'Trebuchet MS',Arial,sans-serif;margin:0 0 13px}.how-list{display:grid;gap:13px}.how{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start}.how i{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e5e9dd;color:#4d674b;font-style:normal;font-size:10px;font-weight:800}.how b{display:block;font-size:11px;margin:0 0 2px}.how span{display:block;color:#737970;font-size:10px;line-height:1.55}.scope-panel{background:#e9e9df;border:0;border-left:2px solid #71846a;border-radius:0;padding:14px 15px}.scope-panel h3{color:#303a30;margin-bottom:7px}.scope-panel p{color:#626a5f;font-size:10px;line-height:1.65;margin:0}.scope-panel b{color:#3d5a40}.recent-head{display:flex;justify-content:space-between;align-items:center}.recent-head button{border:0;background:none;color:#4c6949;font-size:10px;font-weight:700}.recent-empty{font-size:10px;color:var(--muted);padding:8px 0 2px}.recent-item{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px solid var(--line)}.recent-item:first-of-type{margin-top:6px}.recent-file{min-width:0;flex:1}.recent-file b{font-size:10px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recent-file span{font-size:9px;color:var(--muted)}.recent-mark{font-size:9px;font-weight:700}.recent-mark.warn{color:#936315}.recent-mark.clear{color:#476746}.footer{text-align:center;color:#858a81;font-size:9px;margin-top:26px}
+.toast{position:fixed;bottom:20px;right:20px;background:#293d30;color:white;border-radius:4px;padding:11px 14px;font-size:11px;box-shadow:0 8px 25px rgba(19,43,32,.19);opacity:0;transform:translateY(80px);transition:.2s;z-index:5}.toast.show{opacity:1;transform:translateY(0)}.mobile-menu{display:none}
+@media(max-width:900px){.shell{grid-template-columns:195px 1fr}.content{padding:38px 26px 50px}.top{padding:0 26px}.columns{grid-template-columns:minmax(0,1fr) 230px;gap:25px}.right-col{grid-template-columns:1fr}.right-col .recent{grid-column:auto}}
+@media(max-width:650px){.shell{display:block}.side{position:fixed;z-index:4;left:0;top:0;width:245px;transform:translateX(-105%);transition:.22s;box-shadow:12px 0 30px rgba(16,35,31,.2)}.side.open{transform:translateX(0)}.top{height:58px;padding:0 15px}.mobile-menu{display:grid;width:30px;height:30px;border:1px solid var(--line);border-radius:4px;background:var(--paper);place-items:center}.mobile-menu svg{width:16px;height:16px;stroke:currentColor;fill:none}.top-left{display:flex;align-items:center;gap:10px}.local-tag{font-size:0;padding:7px}.local-tag i{margin:0}.content{padding:29px 16px 38px}.hero{align-items:flex-start;flex-direction:column;margin-bottom:24px;gap:14px}.hero h1{font-size:40px}.version{font-size:9px}.columns{grid-template-columns:1fr;gap:30px}.scan-card{padding:16px}.drop{min-height:210px;padding:18px}.right-col{grid-template-columns:1fr}.result-head{flex-direction:column}.verdict{order:-1}.footer{text-align:left}.side-panel{padding-bottom:15px}}.risk-meter{margin:13px 0;padding:13px 14px;background:var(--score-bg);border-left:3px solid var(--score-color)}.risk-meter.green,.verdict.green{--score-color:#47734b;--score-bg:#eaf1e6;--score-ink:#3d6542}.risk-meter.yellow,.verdict.yellow{--score-color:#a88320;--score-bg:#f6f0d9;--score-ink:#79600e}.risk-meter.orange,.verdict.orange{--score-color:#bd6c25;--score-bg:#f8ebdc;--score-ink:#99551c}.risk-meter.red,.verdict.red{--score-color:#ad4b40;--score-bg:#f6e8e5;--score-ink:#913d34}.verdict.green,.verdict.yellow,.verdict.orange,.verdict.red{color:var(--score-ink);background:var(--score-bg)}.meter-head{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--score-ink)}.meter-head span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.7px;font-weight:700}.meter-head strong{display:block;color:var(--score-color);font:700 34px/1 Georgia,'Times New Roman',serif;letter-spacing:-1.2px;font-variant-numeric:tabular-nums}.meter-head small{font:10px 'Trebuchet MS',Arial,sans-serif;font-weight:400;letter-spacing:0;color:#697267}.meter-head strong small{font:inherit;color:inherit}.meter-head>b{font-size:11px}.meter-track{height:7px;background:rgba(38,50,38,.12);margin-top:10px;overflow:hidden}.meter-track i{display:block;height:100%;background:var(--score-color);transition:width .3s ease}.meter-scale{display:flex;justify-content:space-between;gap:5px;margin-top:6px;color:#636b60;font-size:8px}.risk-meter p{margin:8px 0 0;color:#61695e;font-size:9px;line-height:1.5}.recent-mark.yellow{color:#82680d}.recent-mark.orange{color:#a65d20}.recent-mark.red{color:#a14439}.recent-mark.green{color:#476746}@media(max-width:420px){.meter-head strong{font-size:30px}}[hidden]{display:none!important}.scanner-tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin:0 0 20px}.scanner-tab{border:0;border-bottom:2px solid transparent;background:transparent;color:#737a72;padding:0 3px 9px;font-size:11px;font-weight:700}.scanner-tab:hover,.scanner-tab:focus-visible{color:#334f37}.scanner-tab[aria-selected=true]{color:#334f37;border-bottom-color:#55784d}.message-label{display:block;margin:16px 0 7px;font-size:11px;font-weight:700;color:#3b473c}.message-input,#messageInput{display:block;width:100%;min-height:185px;resize:vertical;border:1px solid #cbd0c3;border-radius:3px;background:#fffefa;color:var(--ink);padding:12px;font:13px/1.6 'Trebuchet MS',Arial,sans-serif;outline:none}.message-input:focus,#messageInput:focus{border-color:#66815b;box-shadow:0 0 0 2px rgba(90,125,78,.12)}.message-meta{display:flex;justify-content:space-between;gap:12px;margin-top:6px;color:#737a72;font-size:9px;line-height:1.5}.message-meta span:last-child{white-space:nowrap}.message-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.message-note{font-size:9px;color:#737a72;line-height:1.55;margin:9px 0 0}.message-findings .finding{align-items:flex-start}.finding-points{flex-shrink:0;font-size:8px;color:#6c756b;white-space:nowrap;padding-left:5px}.finding-points.active{font-weight:700;color:#55694b}@media(max-width:650px){.scanner-tabs{margin-bottom:17px}.message-meta{align-items:flex-start}.message-actions .button{flex:1;justify-content:center}}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #a9782c;outline-offset:2px}
+.demo-banner{display:flex;gap:10px;align-items:flex-start;background:#f3eddd;border-left:3px solid #a9782c;padding:12px 15px;margin:0 0 24px;color:#54462f;font-size:12px;line-height:1.55}.demo-banner strong{display:block;color:#453a28;margin-bottom:2px}
+.target-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0 30px}.target{padding:16px 18px;border-top:2px solid var(--green);background:rgba(251,250,246,.62);display:grid;grid-template-columns:86px 1fr;gap:14px;align-items:center}.target strong{font:400 38px/1 Georgia,'Times New Roman',serif;color:var(--green)}.target b{display:block;font-size:12px}.target span{display:block;color:var(--muted);font-size:11px;margin-top:4px}.target em{display:block;font-style:normal;color:#8a6a2f;font-weight:700;font-size:9px;text-transform:uppercase;letter-spacing:.7px;margin-top:5px}
+.overview-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr);gap:30px;align-items:start}.work-list{display:grid}.work-row{display:grid;grid-template-columns:74px minmax(0,1fr) auto;gap:12px;align-items:center;padding:15px 0;border-top:1px solid var(--line)}.work-row:first-child{border-top:0}.case-id{font-size:10px;color:var(--muted);font-weight:700}.work-row b{font-size:12px;display:block}.work-row small{display:block;font-size:10px;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}.status-tag{display:inline-flex;align-items:center;border:1px solid rgba(169,113,39,.22);background:var(--amber);color:#755521;padding:5px 8px;font-size:9px;font-weight:700;white-space:nowrap}.status-tag.neutral{border-color:var(--line);background:#f1f1eb;color:#62685f}.text-button{border:0;background:none;color:#3d6042;font-size:10px;font-weight:700;text-align:left;padding:8px 0}.text-button:hover{text-decoration:underline}.workflow-list{list-style:none;margin:0;padding:0;counter-reset:step}.workflow-list li{counter-increment:step;display:grid;grid-template-columns:28px 1fr;gap:9px;margin:13px 0;font-size:11px;line-height:1.5}.workflow-list li:before{content:counter(step);width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e5e9dd;color:#4d674b;font-weight:700}.workflow-list b{display:block;font-size:11px}.low-key{font-size:10px;color:var(--muted);line-height:1.6}.split-feature{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}.feature-line{border-top:1px solid var(--line);padding-top:15px}.feature-line h3,.case-detail h3{font:700 14px/1.3 'Trebuchet MS',Arial,sans-serif;margin:0 0 7px}.feature-line p{margin:0;color:var(--muted);font-size:11px;line-height:1.6}.page-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.section-title{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin:0 0 12px}.section-title h2{font:400 23px/1.2 Georgia,'Times New Roman',serif;margin:0}.section-title p{margin:5px 0 0;color:var(--muted);font-size:11px}.case-table{width:100%;border-collapse:collapse;font-size:11px}.case-table th{text-align:left;color:#727970;font-size:9px;text-transform:uppercase;letter-spacing:.6px;padding:10px 8px;border-bottom:1px solid var(--line)}.case-table td{padding:13px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.case-table td strong{display:block;font-size:11px}.case-table td small{display:block;color:var(--muted);font-size:9px;margin-top:3px;overflow-wrap:anywhere}.case-detail{margin-top:20px;padding:20px;background:#f5f5ef;border-left:2px solid #71846a}.case-detail p{font-size:11px;line-height:1.6;color:var(--muted)}.evidence-list{display:grid;gap:8px;margin:14px 0}.evidence-list label{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--ink)}.case-detail-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:14px}.case-detail select{padding:8px 9px;border:1px solid #cbd0c3;background:#fffefa;color:var(--ink);font-size:11px;min-height:36px}.notice-small{font-size:10px;color:#785d2a;background:#f3eddd;padding:10px 12px;line-height:1.5;margin-top:14px}
+.registry-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(270px,.8fr);gap:28px;align-items:start}.registry-empty{padding:25px 0;border-top:1px solid var(--line);color:var(--muted);font-size:11px;line-height:1.6}.form-stack{display:grid;gap:13px}.form-stack label{display:grid;gap:5px;font-size:10px;font-weight:700;color:#435044}.form-stack input,.form-stack select,.form-stack textarea{width:100%;min-height:38px;padding:9px 10px;border:1px solid #cbd0c3;border-radius:2px;background:#fffefa;color:var(--ink);font:12px/1.5 'Trebuchet MS',Arial,sans-serif}.form-stack textarea{min-height:120px;resize:vertical}.form-hint{font-weight:400;color:var(--muted);font-size:9px;line-height:1.45}.inline-status{font-size:11px;line-height:1.5;color:#3d6042;min-height:18px}.registry-row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line);font-size:10px}.registry-row strong{display:block;font-size:11px}.registry-row small{display:block;color:var(--muted);font-size:9px;overflow-wrap:anywhere}.report-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(240px,.75fr);gap:32px;align-items:start}.report-guidance{border-left:2px solid #71846a;background:#e9e9df;padding:16px 17px}.report-guidance h3{font:700 13px 'Trebuchet MS',Arial,sans-serif;margin:0 0 8px}.report-guidance p,.report-guidance li{font-size:10px;line-height:1.6;color:#626a5f}.report-guidance ul{padding-left:18px;margin:8px 0}.report-success{padding:12px 14px;background:#e9eee3;color:#3d6042;font-size:11px;line-height:1.55;margin-top:12px}.metric-note{font-size:9px;color:var(--muted);margin-top:6px}.nav-break{height:1px;background:#4a5d4c;margin:18px 9px 14px}.challenge-page .hero{margin-bottom:25px}.challenge-page .hero h1{max-width:740px}
+@media(max-width:900px){.overview-grid,.registry-grid,.report-layout{grid-template-columns:1fr}.target{grid-template-columns:76px 1fr}.case-table{min-width:700px}.case-table-wrap{overflow-x:auto}.overview-grid{gap:24px}}
+@media(max-width:650px){.target-row,.split-feature{grid-template-columns:1fr;gap:12px}.target{grid-template-columns:72px 1fr;padding:13px}.work-row{grid-template-columns:58px minmax(0,1fr)}.work-row .status-tag,.work-row .text-button{grid-column:2}.registry-row{grid-template-columns:1fr 1fr}.section-title{display:block}.case-detail{padding:15px}.challenge-page .hero{margin-bottom:20px}.demo-banner{font-size:11px}}
+
+/* Readability and keyboard access for a broad public audience */
+.demo-banner{font-size:14px}.target b{font-size:14px}.target span{font-size:12px}.target em{font-size:10px}.work-row b{font-size:14px}.work-row small{font-size:12px}.case-id{font-size:11px}.status-tag{font-size:10px}.workflow-list li,.workflow-list b{font-size:12px}.section-title h2{font-size:24px}.section-title p{font-size:12px}.case-table{font-size:12px}.case-table th{font-size:10px}.case-table td strong{font-size:12px}.case-table td small{font-size:10px}.case-detail p,.evidence-list label{font-size:12px}.notice-small{font-size:11px}.form-stack label{font-size:12px}.form-stack input,.form-stack select,.form-stack textarea{font-size:14px;min-height:42px}.form-stack textarea{min-height:130px}.form-hint{font-size:11px}.report-guidance p,.report-guidance li{font-size:11px}.metric-note,.low-key{font-size:10px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* Focused public experience */
+
+.home-actions{margin:0 0 30px}.home-actions .button{font-size:14px;padding:12px 16px}.home-grid{grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr)}.response-invite{margin-top:28px}.response-invite p{max-width:700px}#toolsPage .scanner-tabs,#toolsPage #fileScanner,#toolsPage #fileHow,#toolsPage #fileScope,#toolsPage #recentSection{display:none!important}#toolsPage .card-title h2{font-size:19px}#toolsPage .card-title p{font-size:14px}#toolsPage .message-label{font-size:14px}#toolsPage .message-note{font-size:12px}#toolsPage .message-meta{font-size:11px}#toolsPage .message-actions .button{font-size:14px;padding:12px 15px}#toolsPage .result-summary{font-size:13px}#toolsPage .finding{font-size:12px}#toolsPage .finding b{font-size:12px}#toolsPage .disclaimer{font-size:11px}
+@media(max-width:650px){.home-grid{grid-template-columns:1fr}.home-actions{display:grid}.home-actions .button{justify-content:center}.response-invite{margin-top:22px}}
+/* Channel navigation and session history */
+
+.side{overflow-y:auto}.nav-group-label{margin-top:14px}.channel-nav{margin:0 0 10px 10px;padding-left:10px;border-left:1px solid rgba(220,230,214,.28)}.channel-nav button{padding-top:8px;padding-bottom:8px}.home-channel-picker{margin-bottom:26px}.channel-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}.channel-choice{display:flex;align-items:flex-start;flex-direction:column;text-align:left;border:0;border-top:1px solid var(--line);padding:15px 4px;background:transparent;color:var(--ink)}.channel-choice:hover{color:#31533a}.channel-choice strong{font:400 20px/1.2 Georgia,'Times New Roman',serif}.channel-choice span{font-size:12px;line-height:1.5;color:var(--muted);margin-top:4px}.home-next-steps{grid-template-columns:1fr 1fr;gap:32px}.history-list{display:grid}.history-item{display:grid;grid-template-columns:150px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line);font-size:12px}.history-item:first-child{border-top:0}.history-item strong{display:block}.history-item small{display:block;color:var(--muted);font-size:10px;margin-top:3px}.history-type{font-weight:700;color:var(--green)}.history-empty{padding:18px 0;color:var(--muted);font-size:12px}
+#toolsPage .scanner-tabs,#toolsPage #fileScanner,#toolsPage #fileHow,#toolsPage #fileScope,#toolsPage #recentSection{display:none!important}
+@media(max-width:650px){.channel-choice-grid,.home-next-steps{grid-template-columns:1fr}.history-item{grid-template-columns:1fr auto;gap:5px}.history-type{grid-column:1/-1}.home-channel-picker{padding:16px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside class="side" id="side">
+  <div class="brand"><span class="mark"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3 19 6v5.3c0 4.4-2.8 7.9-7 9.7-4.2-1.8-7-5.3-7-9.7V6l7-3Z" stroke="currentColor" stroke-width="1.8"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>aman</b><small>GOVERNMENT MESSAGE CHECK</small></span></div>
+  <div class="section-label">Aman</div>
+  <nav class="nav" aria-label="Main navigation"><button class="selected" id="overviewNav" data-route="overviewPage">Home</button></nav>
+  <div class="section-label nav-group-label">Check a message</div>
+  <nav class="nav channel-nav" aria-label="Choose message channel"><button id="smsNav" data-channel="SMS">SMS</button><button id="whatsappNav" data-channel="WhatsApp">WhatsApp</button><button id="emailNav" data-channel="Email">Email</button><button id="phoneNav" data-channel="Phone call notes">Call notes</button></nav>
+  <nav class="nav" aria-label="History"><button id="historyNav" data-route="historyPage">History</button></nav>
+  <div class="nav-break"></div><div class="section-label">For response teams</div>
+  <nav class="nav" aria-label="Response team navigation"><button id="casesNav" data-route="casesPage">Team review</button></nav>
+  <nav class="nav" hidden aria-hidden="true"><button id="channelsNav" data-route="channelsPage">Official channels</button><button id="scanNav">File and message checks</button><button id="recentNav">Recent checks</button></nav>
+  <div class="side-bottom"><div class="privacy-card"><div class="shield">Demo only</div><p>Message checks happen in this browser. Reports are not sent to a government team.</p></div><div class="side-foot">Aman points out warning signs.<br>It cannot confirm who sent a message or verify a real payment request.</div></div>
+</aside>
+<main>
+  <header class="top"><div class="top-left"><button class="mobile-menu" id="menu" aria-label="Open menu"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><div class="crumb">Aman <span style="color:#c1cbc4">/</span> <b id="crumbLabel">Overview</b></div></div><div class="top-right"><div class="local-tag"><i></i> Demo workspace</div><div class="avatar">AM</div></div></header>
+  <div class="content challenge-page" id="overviewPage">
+    <div class="eyebrow">Digital trust · Aman</div>
+    <div class="hero"><div><h1>Check a suspicious government message.</h1><p>Choose where it came from. Aman checks the text for warning signs and explains what to do next.</p></div><span class="version">Private, local text check</span></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">●</span><div><strong>Aman checks clues, not identities</strong>It cannot confirm who contacted you, verify a real payment, or prove a channel is official. Confirm requests through a government app or website you find independently.</div></div>
+    <section class="card scan-card home-channel-picker"><div class="section-title"><div><h2>What did you receive?</h2><p>Choose a message type to start a check.</p></div></div><div class="channel-choice-grid"><button type="button" class="channel-choice" data-channel="SMS"><strong>SMS</strong><span>Text message</span></button><button type="button" class="channel-choice" data-channel="WhatsApp"><strong>WhatsApp</strong><span>Chat or forwarded message</span></button><button type="button" class="channel-choice" data-channel="Email"><strong>Email</strong><span>Email text</span></button><button type="button" class="channel-choice" data-channel="Phone call notes"><strong>Call notes</strong><span>Type what the caller said. Aman does not record or identify calls.</span></button></div></section>
+    <div class="footer">Message text stays in this browser · No live monitoring · No official sources connected</div>
+  </div>
+  <div class="content challenge-page" id="casesPage" hidden>
+    <div class="eyebrow">Response team view</div><div class="hero"><div><h1>Team review</h1><p>Check reports and record the next step. This demo does not confirm a scam or contact anyone.</p></div><span class="version">Demo workspace</span></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">●</span><div><strong>Demo workflow only</strong>Initial cases are fictional. Statuses, evidence notes, and response drafts exist only in this browser session. No case is sent to a government team or provider.</div></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">i</span><div><strong>What to do here</strong>Open a report, note what still needs checking, and save its progress. A real service team must confirm whether the channel is official. Aman does not verify or remove it.</div></div>
+    <section class="card scan-card"><div class="section-title"><div><h2>Reports for review</h2><p>Open a report, check the details, and save what happens next.</p></div><div class="page-actions"><button class="button" type="button" data-route="channelsPage">Official-channel list</button></div></div><div class="case-table-wrap"><table class="case-table"><thead><tr><th>Report</th><th>Where it appeared</th><th>Link or account</th><th>Progress · demo</th><th></th></tr></thead><tbody id="caseTableBody"></tbody></table></div><div id="caseDetail" class="case-detail" hidden><div class="section-title"><div><h2 id="caseDetailTitle">Report details</h2><p id="caseDetailMeta"></p></div><button type="button" class="text-button" id="closeCaseDetail">Close details</button></div><p id="caseDetailSummary"></p><h3>Quick checks</h3><p class="low-key" style="margin-top:-3px">Tick what the reviewer has considered. These boxes are reminders, not proof.</p><div class="evidence-list"><label><input type="checkbox" data-evidence="indicator"> Keep the link or account name as text. Do not open the link.</label><label><input type="checkbox" data-evidence="timestamp"> Note when the message arrived.</label><label><input type="checkbox" data-evidence="official"> Ask the official service team if this channel is theirs.</label><label><input type="checkbox" data-evidence="impact"> Consider who could be affected and what help they need.</label></div><div class="case-detail-actions"><label for="caseStatus">Progress in this demo</label><select id="caseStatus"><option value="Needs verification">Needs checking</option><option value="Evidence review">Being checked</option><option value="Owner confirmation pending">Waiting for official team</option><option value="Confirmed for response">Ready for team follow-up · demo</option><option value="Closed in demo">Done · demo only</option></select><p id="caseStatusHint" class="low-key" style="grid-column:1/-1;margin:0">This only tracks progress. It does not verify the report or contact anyone.</p><button type="button" class="button button-primary" id="saveCaseReview">Save progress</button><button type="button" class="button" id="downloadCaseDraft">Download summary for team</button></div><div id="caseActionMessage" class="inline-status" aria-live="polite"></div><div class="notice-small">The summary is a file for the response team to review. It is not sent anywhere.</div></div></section>
+    <div class="footer">Human verification and authorized decision-making remain essential</div>
+  </div>
+  <div class="content challenge-page" id="channelsPage" hidden>
+    <div class="eyebrow">For response teams · Channel lifecycle</div><div class="hero"><div><h1>Official-channel register</h1><p>A starting point for the records people and analysts need to check whether a government financial channel is approved, changed, delegated, or retired.</p></div><span class="version">No official data connected</span></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">●</span><div><strong>Not an official source</strong>The register starts empty. Records you add below stay in this browser session and are marked “owner confirmation needed.” Only an authorized channel owner can establish authenticity.</div></div>
+    <div class="registry-grid"><section class="card scan-card"><div class="section-title"><div><h2>Channel records</h2><p>Lifecycle status should be maintained by the accountable service owner.</p></div><button type="button" class="button" id="loadSampleChannels">Load synthetic examples</button></div><div id="channelList" class="registry-empty">No channel records are configured. Add an example or wait for an authorized owner-maintained source.</div></section><section class="card scan-card"><div class="section-title"><div><h2>Add a demo record</h2><p>This does not make a channel official or verified.</p></div></div><form id="channelForm" class="form-stack"><label>Service or channel name<input id="channelName" maxlength="80" required placeholder="Example: Online payment service"></label><label>Domain or public account<input id="channelIndicator" maxlength="180" required placeholder="payments.example"><span class="form-hint">Use fictional .example domains for the demo. Do not add real personal data.</span></label><label>Responsible owner or team<input id="channelOwner" maxlength="80" required placeholder="Service owner team"></label><label>Lifecycle state<select id="channelLifecycle"><option>Pending owner confirmation</option><option>Change review needed</option><option>Retirement review needed</option></select></label><button class="button button-primary" type="submit">Add session-only record</button><div id="channelFormStatus" class="inline-status" aria-live="polite"></div></form></section></div>
+    <div class="footer">A real deployment would need authenticated owners, source verification, an audit trail, and approved update procedures</div>
+  </div>
+  <div class="content challenge-page" id="reportsPage" hidden>
+    <div class="eyebrow">Accessible reporting · Synthetic demo</div><div class="hero"><div><h1>Report something suspicious</h1><p>Tell us about a website, message, account, or call that may be pretending to be a government financial service.</p></div><span class="version">No report is transmitted</span></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">●</span><div><strong>Demo report only</strong>A report you create appears in Team review in this prototype. It is not sent to a real response team. Do not enter passwords, OTPs, payment data, or other sensitive personal information.</div></div>
+    <div class="report-layout"><section class="card scan-card"><form id="reportForm" class="form-stack"><label>What did you receive?<select id="reportType" required><option value="">Choose a channel type</option><option>SMS or messaging app</option><option>Email</option><option>Website or domain</option><option>Social media or public account</option><option>Phone call or other channel</option></select></label><label>Link or public channel name, if available<input id="reportIndicator" maxlength="240" placeholder="Paste the address as text. Do not open it."><span class="form-hint">Do not include passwords, OTPs, card numbers, or bank details.</span></label><label>What made it seem suspicious?<textarea id="reportDescription" maxlength="1200" placeholder="For example: it asked for an urgent payment or used a link you did not recognize."></textarea></label><label>When did you receive or see it?<input id="reportTime" type="datetime-local"></label><label style="display:flex;grid-template-columns:18px 1fr;align-items:start"><input id="reportDemoConsent" type="checkbox" required style="width:16px;min-height:16px;margin:2px 0"><span>I understand this is a demonstration. The report stays in this session and no team will receive it.</span></label><button type="submit" class="button button-primary">Create a demo report</button><div id="reportStatus" class="inline-status" aria-live="polite"></div></form><div id="reportSuccess" class="report-success" hidden></div><button class="button" type="button" id="reportViewQueue" hidden>View in Team review</button></section><aside class="report-guidance"><h3>If you think you may be affected</h3><p>Use a government app or website you find independently to confirm a payment request. Do not use contact details or links in the suspicious message.</p><ul><li>If you shared payment details, contact your bank using a trusted channel.</li><li>If you shared a password or code, contact the relevant service through its official app or site.</li><li>Keep the original message if you need to show it to an authorized support team.</li></ul><p>Aman cannot submit a real report or provide emergency assistance.</p></aside></div>
+    <div class="footer">Accessible labels and keyboard controls are included in this prototype; test them with affected users</div>
+  </div>
+  <div class="content challenge-page" id="historyPage" hidden>
+    <div class="eyebrow">Your activity</div><div class="hero"><div><h1>History</h1><p>See the checks and reports created in this page session.</p></div><span class="version">Clears when this page reloads</span></div>
+    <div class="demo-banner" role="note"><span aria-hidden="true">●</span><div><strong>Only activity details appear here</strong>Aman does not put message text, call notes, links, or report descriptions in this history. Items stay in memory in this browser tab and are cleared when you reload or close it.</div></div>
+    <section class="card scan-card"><div class="section-title"><div><h2>Recent checks and reports</h2><p>History is visible only in this session.</p></div><button class="button" type="button" id="clearHistory">Clear history</button></div><div id="historyList" class="history-list" aria-live="polite"><p class="registry-empty">No checks or reports yet.</p></div></section>
+    <div class="footer">Message contents and report descriptions are not copied into history</div>
+  </div>
+  <div class="content" id="toolsPage" hidden>
+
+    <div class="eyebrow">Aman · Local message check</div>
+    <div class="hero"><div><h1 id="scannerHeroTitle">Check an SMS before you pay.</h1><p id="scannerHeroDescription">Paste the text to look for pressure, suspicious links, or requests for private details.</p></div><span class="version" id="scannerVersion">Text stays in this browser</span></div>
+    <div class="columns">
+      <section class="card scan-card" aria-labelledby="scanTitle">
+        <div class="scanner-tabs" role="tablist" aria-label="Choose what to check"><button class="scanner-tab" id="fileTab" type="button" role="tab" aria-selected="true" aria-controls="fileScanner">Check a file</button><button class="scanner-tab" id="messageTab" type="button" role="tab" aria-selected="false" aria-controls="messageScanner">Check a message</button></div>
+        <div id="fileScanner" role="tabpanel" aria-labelledby="fileTab">
+        <div class="card-title"><span class="title-icon"><svg viewBox="0 0 24 24"><path d="M4 7V5a1 1 0 0 1 1-1h2m11 0h1a1 1 0 0 1 1 1v2M4 17v2a1 1 0 0 0 1 1h2m11 0h1a1 1 0 0 0 1-1v-2M8 12h8m-4-4v8"/></svg></span><div><h2 id="scanTitle">Scan a file for warning signs</h2><p>We inspect the file name, type, header, and selected content patterns.</p></div></div>
+        <input class="file-input" type="file" id="fileInput" aria-label="Choose a file to scan">
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a file or drop it here">
+          <span class="upload-icon"><svg viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5"/><path d="M5 14v5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5"/></svg></span>
+          <strong id="dropTitle">Drop a file here to check it</strong><p id="dropSub">or choose a file from your device</p>
+          <button class="button button-primary" id="chooseBtn" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>Choose file</button>
+          <span class="limit">Maximum 50 MB · Nothing is uploaded · File is never executed</span>
+        </div>
+        <div class="privacy-strip"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><span>Analysis runs locally in your browser. The file bytes are not transmitted or saved by this page.</span></div>
+        <div class="result" id="result" aria-live="polite"></div>
+        </div>
+        <div id="messageScanner" role="tabpanel" aria-labelledby="messageTab" hidden>
+          <div class="card-title"><span class="title-icon"><svg viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-5 4v-4.7a2.5 2.5 0 0 1-1-1.8v-8Z"/><path d="M8 8h8M8 11.5h5"/></svg></span><div><h2 id="messageTitle">Check a suspicious SMS</h2><p id="messageDescription">Paste the message text to look for payment pressure, suspicious links, or requests for sensitive details.</p></div></div>
+          <label class="message-label" id="messageLabel" for="messageInput">SMS text</label>
+          <textarea id="messageInput" maxlength="5000" rows="7" spellcheck="true" placeholder="Paste the SMS text here…"></textarea>
+          <div class="message-meta"><span>Remove names, phone numbers, and personal details before pasting.</span><span id="messageCount">0 / 5,000</span></div>
+          <div class="message-actions"><button class="button button-primary" id="analyzeMessage" type="button">Check SMS</button><button class="button" id="messageExample" type="button">Try fictional SMS</button><button class="button" id="reportFromMessage" type="button">Report a suspicious message</button></div>
+          <p class="message-note" id="messageNote">Aman checks text locally. It does not open links or verify the sender. Example messages are fictional.</p>
+          <div class="result" id="messageResult" aria-live="polite"></div>
+        </div>
+      </section>
+      <aside class="right-col">
+        <section class="card side-panel" id="fileHow"><h3>What happens when you scan</h3><div class="how-list">
+          <div class="how"><i>1</i><div><b>Check file identity</b><span>Compare its extension, reported type, and recognizable file header.</span></div></div>
+          <div class="how"><i>2</i><div><b>Look for risky clues</b><span>Check for deceptive double extensions and selected script or document patterns.</span></div></div>
+          <div class="how"><i>3</i><div><b>Review the SHA-256</b><span>Copy the fingerprint to compare with a trusted source or security team.</span></div></div>
+        </div></section>
+        <section class="card side-panel" id="messageHow" hidden><h3>What message checks look for</h3><div class="how-list">
+          <div class="how"><i>1</i><div><b>Payment pressure</b><span>Claims about fines, fees, and urgent payment requests.</span></div></div>
+          <div class="how"><i>2</i><div><b>Suspicious links</b><span>Shortened or imitation links; Aman never opens them.</span></div></div>
+          <div class="how"><i>3</i><div><b>Requests for secrets</b><span>Prompts for OTPs, passwords, card details, or identity information.</span></div></div>
+        </div></section>
+        <section class="card side-panel scope-panel" id="fileScope"><h3>Know what this check can tell you</h3><p>This is a <b>basic local inspection</b>, not a full antivirus engine. It can catch some warning signs, but a clean result does not guarantee a file is safe. Keep your device security software on and only open files from sources you trust.</p></section>
+        <section class="card side-panel scope-panel" id="messageScope" hidden><h3>Know what this check can tell you</h3><p>This is a <b>text-only clue check</b>. It cannot verify who sent a message, authenticate a government service, or determine whether a fine is real. Confirm payment requests by opening the official app or website yourself.</p></section>
+        <section class="card side-panel recent" id="recentSection"><div class="recent-head"><h3 style="margin:0">Recent file checks</h3><button id="clearRecent" type="button">Clear</button></div><div id="recentList"><div class="recent-empty">Files you check in this session will appear here.</div></div></section>
+      </aside>
+    </div>
+    <div class="footer">Message check · Text stays in this browser · Not an official sender verification</div>
+  </div>
+</main>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+(() => {
+  const input=document.getElementById('fileInput'), drop=document.getElementById('drop'), choose=document.getElementById('chooseBtn');
+  const result=document.getElementById('result'), toast=document.getElementById('toast'), recentList=document.getElementById('recentList');
+  const fileTab=document.getElementById('fileTab'),messageTab=document.getElementById('messageTab'),messageInput=document.getElementById('messageInput'),messageResult=document.getElementById('messageResult');
+  let recent=[],toastTimer;
+  const maxBytes=50*1024*1024, sampleBytes=5*1024*1024;
+  function notify(message){toast.textContent=message;toast.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('show'),2800)}
+  function setScannerMode(mode){
+    const fileMode=mode==='file';
+    document.getElementById('fileScanner').hidden=!fileMode;
+    document.getElementById('messageScanner').hidden=fileMode;
+    document.getElementById('fileHow').hidden=!fileMode;
+    document.getElementById('messageHow').hidden=fileMode;
+    document.getElementById('fileScope').hidden=!fileMode;
+    document.getElementById('messageScope').hidden=fileMode;
+    fileTab.setAttribute('aria-selected',String(fileMode));
+    messageTab.setAttribute('aria-selected',String(!fileMode));
+  }
+  window.amanSetScannerMode=setScannerMode;
+  fileTab.addEventListener('click',()=>setScannerMode('file'));
+  messageTab.addEventListener('click',()=>setScannerMode('message'));
+  messageInput.addEventListener('input',()=>{document.getElementById('messageCount').textContent=messageInput.value.length.toLocaleString()+' / 5,000';messageResult.classList.remove('show')});
+  document.getElementById('messageExample').addEventListener('click',()=>{
+    messageInput.value=window.amanExampleForChannel?window.amanExampleForChannel(window.amanChannelMode||'SMS'):'A fictional government payment request asks for urgent payment and an OTP.';
+    messageInput.dispatchEvent(new Event('input'));messageInput.focus();
+  });
+  document.getElementById('analyzeMessage').addEventListener('click',()=>{
+    const message=messageInput.value.trim();
+    if(!message){notify('Paste a message first.');messageInput.focus();return}
+    renderMessageResult(message);
+  });
+  function formatSize(n){if(n<1024)return n+' B';if(n<1048576)return(n/1024).toFixed(1)+' KB';return(n/1048576).toFixed(2)+' MB'}
+  function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+  choose.addEventListener('click',e=>{e.stopPropagation();input.click()});
+  drop.addEventListener('click',e=>{if(e.target!==choose)input.click()});
+  drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click()}});
+  input.addEventListener('change',()=>{if(input.files&&input.files[0])scan(input.files[0]);input.value=''});
+  ['dragenter','dragover'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.add('drag')}));
+  ['dragleave','drop'].forEach(type=>drop.addEventListener(type,e=>{e.preventDefault();drop.classList.remove('drag')}));
+  drop.addEventListener('drop',e=>{const f=e.dataTransfer.files&&e.dataTransfer.files[0];if(f)scan(f)});
+  document.getElementById('menu').addEventListener('click',()=>document.getElementById('side').classList.toggle('open'));
+  document.getElementById('scanNav').addEventListener('click',()=>{document.getElementById('side').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})});
+  document.getElementById('recentNav').addEventListener('click',()=>{document.getElementById('side').classList.remove('open');document.getElementById('recentSection').scrollIntoView({behavior:'smooth',block:'center'})});
+  document.getElementById('clearRecent').addEventListener('click',()=>{recent=[];renderRecent();notify('Recent checks cleared from this session.')});
+  function magicType(bytes){
+    if(bytes.length>=4&&bytes[0]===0x25&&bytes[1]===0x50&&bytes[2]===0x44&&bytes[3]===0x46)return'PDF document';
+    if(bytes.length>=8&&bytes[0]===0x89&&bytes[1]===0x50&&bytes[2]===0x4e&&bytes[3]===0x47)return'PNG image';
+    if(bytes.length>=3&&bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff)return'JPEG image';
+    if(bytes.length>=6&&String.fromCharCode(...bytes.slice(0,6)).match(/^GIF8[79]a$/))return'GIF image';
+    if(bytes.length>=2&&bytes[0]===0x4d&&bytes[1]===0x5a)return'Windows executable (PE)';
+    if(bytes.length>=4&&bytes[0]===0x7f&&bytes[1]===0x45&&bytes[2]===0x4c&&bytes[3]===0x46)return'Linux executable (ELF)';
+    if(bytes.length>=4&&((bytes[0]===0xfe&&bytes[1]===0xed&&bytes[2]===0xfa)||(bytes[0]===0xcf&&bytes[1]===0xfa)))return'Apple executable (Mach-O)';
+    if(bytes.length>=4&&bytes[0]===0x50&&bytes[1]===0x4b)return'ZIP-based file';
+    if(bytes.length>=4&&bytes[0]===0x52&&bytes[1]===0x61&&bytes[2]===0x72&&bytes[3]===0x21)return'RAR archive';
+    if(bytes.length>=6&&String.fromCharCode(...bytes.slice(0,6))==='7z\xBC\xAF\x27\x1C')return'7-Zip archive';
+    return'Unknown or plain-text header';
+  }
+  function extension(name){const m=name.toLowerCase().match(/\.([a-z0-9]{1,12})$/);return m?m[1]:''}
+  function inspectZip(data){
+    if(data.length<22||data[0]!==0x50||data[1]!==0x4b)return null;
+    const view=new DataView(data.buffer,data.byteOffset,data.byteLength);
+    let end=-1;const floor=Math.max(0,data.length-65557);
+    for(let p=data.length-22;p>=floor;p--){if(view.getUint32(p,true)===0x06054b50&&p+22+view.getUint16(p+20,true)===data.length){end=p;break}}
+    if(end<0)return{entries:[],encrypted:false,complete:false,total:0};
+    const total=view.getUint16(end+10,true),offset=view.getUint32(end+16,true);
+    if(total===0xffff||offset===0xffffffff)return{entries:[],encrypted:false,complete:false,total};
+    const entries=[];let p=offset,encrypted=false,complete=true;
+    for(let i=0;i<Math.min(total,3000);i++){
+      if(p+46>data.length||view.getUint32(p,true)!==0x02014b50){complete=false;break}
+      const flags=view.getUint16(p+8,true),compressed=view.getUint32(p+20,true),uncompressed=view.getUint32(p+24,true);
+      const nameLen=view.getUint16(p+28,true),extraLen=view.getUint16(p+30,true),commentLen=view.getUint16(p+32,true);
+      if(p+46+nameLen+extraLen+commentLen>data.length){complete=false;break}
+      const decoder=new TextDecoder(flags&0x800?'utf-8':'latin1');
+      const name=decoder.decode(data.subarray(p+46,p+46+nameLen));
+      entries.push({name,compressed,uncompressed});if(flags&1)encrypted=true;
+      p+=46+nameLen+extraLen+commentLen;
+    }
+    return{entries,encrypted,complete:complete&&entries.length===total,total};
+  }
+  function analyze(file,bytes,header,archiveBytes){
+    const findings=[],name=file.name.toLowerCase(),ext=extension(name);
+    const add=(level,title,detail)=>findings.push({level,title,detail,points:level==='high'?75:level==='warn'?30:0});
+    const dangerous=['exe','dll','scr','com','msi','bat','cmd','ps1','psm1','vbs','vbe','js','jse','hta','jar','reg','iso','apk','lnk','url','cpl'];
+    if(/\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|txt)\.(exe|dll|scr|com|bat|cmd|ps1|vbs|js|hta)$/i.test(file.name))add('high','Deceptive double extension','The name looks like a document or image but ends with a file type that can run code.');
+    if(dangerous.includes(ext))add('warn','Executable or script file type','This file type may run code or change your device when opened. Only use it if you expected it and trust its source.');
+    if(['docm','xlsm','pptm'].includes(ext))add('warn','Macro-enabled Office document','This document format can contain macros. Do not enable macros unless you fully trust the source.');
+    if(['rar','7z','iso'].includes(ext))add('info','Archive or disk image','This prototype does not inspect the contents of this archive or disk image.');
+    if(['html','htm','svg'].includes(ext)&&(/<script\b|onload\s*=|javascript:/i.test(text)))add('warn','Active web content','This web document contains script or event-handler content that can run when opened in a browser.');
+    const match=header.match(/Windows executable|Linux executable|Apple executable/);
+    const expected={pdf:/^PDF/,png:/^PNG/,jpg:/^JPEG/,jpeg:/^JPEG/,gif:/^GIF/,exe:/^Windows/,dll:/^Windows/,scr:/^Windows/,zip:/^ZIP/,docx:/^ZIP/,xlsx:/^ZIP/,pptx:/^ZIP/};
+    if(expected[ext]&&!expected[ext].test(header))add('warn','File extension and header do not match','The file contents do not begin with the usual signature for .'+ext+'. This can happen with mislabeled or disguised files.');
+    if(match&&!['exe','dll','scr','com','msi'].includes(ext))add('high','Executable content under another extension','The file header identifies a program, while its filename does not use a typical executable extension.');
+    if(bytes.length>=5&&bytes[0]===0x4d&&bytes[1]===0x5a&&bytes.length<128)add('warn','Unusually short executable header','The file starts like a Windows program but is unusually small. It may be incomplete or specially crafted.');
+    const zip=inspectZip(archiveBytes);
+    if(zip){
+      add('info','Archive directory inspected','Read '+zip.entries.length+' of '+zip.total+' entry names. File contents were not extracted or executed.');
+      const risky=zip.entries.filter(e=>/\.(?:exe|dll|scr|com|msi|bat|cmd|ps1|vbs|js|hta|jar|lnk)$/i.test(e.name));
+      if(risky.length)add('warn','Executable or script inside archive',risky.slice(0,4).map(e=>e.name).join(', ')+(risky.length>4?' and '+(risky.length-4)+' more':'')+'. Inspect these entries carefully before extracting.');
+      if(zip.entries.some(e=>/vbaProject\.bin/i.test(e.name)))add('warn','Office macro project inside archive','The archive directory contains a VBA project marker.');
+      if(zip.encrypted)add('warn','Encrypted archive entries','Some archive entries are encrypted, so their contents cannot be inspected here.');
+      if(zip.entries.some(e=>/(?:^|\/)\.\.(?:\/|$)/.test(e.name)||/^(?:\/|[A-Za-z]:\\)/.test(e.name)))add('warn','Unusual archive path','An entry uses an absolute or parent-directory path. Do not extract it without trusted security software.');
+      const oversized=zip.entries.some(e=>e.uncompressed>100*1024*1024||(e.uncompressed>20*1024*1024&&e.compressed>0&&e.uncompressed/e.compressed>100));
+      if(oversized)add('warn','Extreme archive expansion size','An entry expands to an unusually large size. Avoid extracting it on a device with limited storage.');
+      if(!zip.complete)add('info','Archive listing may be incomplete','This archive uses a layout or size that this lightweight directory reader cannot fully inspect.');
+    }
+    const text=new TextDecoder('latin1').decode(bytes).toLowerCase();
+    if(text.includes('eicar-standard-antivirus-test-file'))add('high','Recognized antivirus test pattern','This file contains the EICAR test string used to check antivirus detection. It is a harmless test pattern, not proof of malware.');
+    if(/powershell(?:\.exe)?[^\r\n]{0,120}-(?:enc|encodedcommand)\b|frombase64string\s*\(|wscript\.shell|createobject\s*\(\s*["']wscript\.shell|mshta(?:\.exe)?\s+https?:|rundll32(?:\.exe)?[^\r\n]{0,100}javascript:/i.test(text))add('high','Suspicious command or script pattern','A pattern associated with encoded commands or script-based execution was found. This needs expert review.');
+    if(/(?:eval\s*\(\s*atob\s*\(|document\.write\s*\(\s*atob\s*\(|fromcharcode\s*\(\s*atob\s*\()/i.test(text))add('warn','Obfuscated script pattern','The file contains a script pattern that can hide what code will do when opened.');
+    if(ext==='pdf'&&/\/(?:javascript|js|openaction|launch|embeddedfile)\b/i.test(text))add('warn','Active PDF feature marker','The PDF contains a JavaScript, launch, or embedded-file marker. These features can be legitimate, but deserve caution.');
+    if(/vbaProject\.bin/i.test(text))add('warn','Office macro project marker','The archive directory contains a marker associated with embedded Office macros.');
+    if(!findings.length)add('info','No obvious warning signs found','The checks performed did not identify a known warning pattern. This does not certify the file as safe.');
+    return findings;
+  }
+  function scoreFor(findings){return Math.min(100,findings.reduce((sum,f)=>sum+f.points,0))}
+  function scoreBand(score){return score>=75?'red':score>=50?'orange':score>=25?'yellow':'green'}
+  function inspectMessage(message){
+    const findings=[];
+    const add=(level,title,detail,points)=>findings.push({level,title,detail,points:points||0});
+    const government=/(?:\b(?:dubai\s+police|abu\s+dhabi\s+police|uae\s+police|uae\s+pass|government|traffic\s+department|rta|fujairah\s+finance|finance\s+department)\b|شرطة\s+دبي|شرطة\s+أبوظبي|حكومة|وزارة\s+الداخلية|مالية\s+الفجيرة)/i.test(message);
+    const fine=/(?:\b(?:fine|traffic\s+violation|violation\s+notice|penalty)\b|مخالفة|غرامة)/i.test(message);
+    const asksMoney=/(?:\b(?:pay|payment|transfer|fee|fine|refund|aed|dirham|amount\s+due)\b|ادفع|الدفع|سداد|مبلغ\s+مستحق|درهم)/i.test(message);
+    const urls=message.match(/(?:https?:\/\/|www\.)[^\s<>\"']+|\b(?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?(?:\/[^\s<>\"']*)?/gi)||[];
+    if(government&&fine&&asksMoney)add('warn','Government fine or payment claim','The text mentions a government authority, a fine, and money. That combination deserves a check, but it does not prove the message is fake.',10);
+    else if(asksMoney)add('warn','Payment or money request','The message mentions money. This can be legitimate; independently check unexpected payment requests before acting.',5);
+    if(/(?:\b(?:immediately|urgent|today\s+only|within\s+\d+\s*(?:hours?|days?)|last\s+warning|pay\s+now|final\s+notice|account.{0,20}(?:blocked|suspended)|legal\s+action|arrest\s+warrant)\b|عاجل|فوراً|فورا|اليوم|خلال\s+\d+|إجراء\s+قانوني|اجراء\s+قانوني)/i.test(message))
+      add('warn','Pressure or deadline','The text uses urgency, a deadline, or a threat. Scammers often use pressure, though legitimate notices can also be urgent.',10);
+    const asksSensitive=/(?:\b(?:send|sending|share|sharing|reply\s+with|provide|enter|submit|text|message|confirm|verify|give|ask(?:ing)?\s+for|need)\b[^.!?\n]{0,120}\b(?:otp|one[- ]time\s+(?:password|code)|verification\s+code|security\s+code|pin|cvv|cvc|card\s+number|bank\s+(?:details|login)|password|emirates\s+id)\b|(?:أرسل|ارسل|شارك|أدخل|ادخل|أرسلوا|زوّد|زود|أعطني|اعطني|أدخلوا)[^.!?\n]{0,80}(?:رمز|كلمة\s+المرور|الرقم\s+السري|بطاقة|الهوية\s+الإماراتية|الهوية\s+الاماراتية|رمز\s+التحقق))/i.test(message);
+    if(asksSensitive)add('high','Request for a password, code, or personal detail','The text appears to ask someone to send or enter a password, one-time code, card/bank detail, or identity detail. Do not share these in a message.',30);
+    if(urls.length)add('info','Link included','Aman does not open links or verify their destination. Navigate to the official app or website yourself instead of using a message link.',0);
+    const shorteners=['bit.ly','tinyurl.com','t.co','goo.gl','is.gd','cutt.ly','rb.gy','shorturl.at','rebrand.ly'];
+    const linkFlags={shortener:false,placeholder:false,authorityName:false,unusualAddress:false,punycode:false};
+    for(const raw of urls){
+      const cleaned=raw.replace(/[),.!?;:]+$/,'');
+      try{
+        const parsed=new URL(/^https?:\/\//i.test(cleaned)?cleaned:'https://'+cleaned),host=parsed.hostname.toLowerCase();
+        if(shorteners.includes(host))linkFlags.shortener=true;
+        if(host.endsWith('.example')||host.endsWith('.invalid'))linkFlags.placeholder=true;
+        if(host.split('.').some(label=>label.startsWith('xn--')))linkFlags.punycode=true;
+        if(parsed.username||parsed.password||/^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)||/^\[[0-9a-f:]+\]$/i.test(host))linkFlags.unusualAddress=true;
+        const authorityInHost=/(?:dubai.?police|abu.?dhabi.?police|abu.?dhabi.?finance|uae.?police|uae.?pass|fujairah.?finance|finance.?department|moi|government|rta|u\.a\.e)/i.test(host);
+        const familiarEnding=host.endsWith('.gov.ae')||host==='rta.ae'||host.endsWith('.rta.ae')||host==='u.ae'||host.endsWith('.u.ae');
+        if(authorityInHost&&!familiarEnding)linkFlags.authorityName=true;
+      }catch{}
+    }
+    if(linkFlags.shortener)add('warn','Shortened link','A short link hides the destination until opened. Do not use it for an unexpected payment; go to the service through an app or address you already trust.',15);
+    if(linkFlags.authorityName)add('warn','Government name appears in the link address','The address contains a government or agency name, but Aman has no verified list to confirm who owns it. A name in a link does not make it official.',15);
+    if(linkFlags.unusualAddress)add('warn','Unusual link format','The link uses an IP address or includes text before the @ sign. These formats can hide who controls the destination; do not open it unless independently verified.',20);
+    if(linkFlags.punycode)add('warn','Encoded domain name','The link contains a domain label encoded for international characters. This can be legitimate, but look-alike characters can be hard to spot; verify the address independently.',10);
+    if(linkFlags.placeholder)add('info','Example-only link address','This uses a reserved example domain, which is not a normal public service address. It is often used in demonstrations.',0);
+    if(/[\u202a-\u202e\u2066-\u2069\u200e\u200f]/.test(message))add('warn','Hidden text-direction character','The text contains an invisible direction-control character that can make names or links appear in a misleading order.',15);
+    if(!findings.length)add('info','No obvious scam clues found','The text checks found no obvious warning pattern. This does not verify the sender, links, or whether a request is genuine.',0);
+    return findings;
+  }
+  function renderMessageResult(message){
+    const findings=inspectMessage(message),score=scoreFor(findings),band=scoreBand(score);
+    const labels={green:'No obvious signs',yellow:'Caution',orange:'Suspicious',red:'Highly suspicious'};
+    const summaries={green:'No obvious scam patterns were found in the text. This does not authenticate the sender or links.',yellow:'A warning sign needs a closer look. Verify the request using an official app or website you open yourself.',orange:'Several warning signs appear together. Do not pay or reply until you verify the request independently.',red:'Strong scam warning signs were found. Do not click, pay, or share personal information.'};
+    const actions={green:'Still verify unexpected payment or identity requests through an official channel you find independently.',yellow:'Do not use the message link to pay. Check the official service directly.',orange:'Keep the message unopened at its links; contact the organization through a trusted official channel.',red:'Do not click, pay, or share codes or details. Save the message if you need to report it through an official channel.'};
+    const channelName=window.amanChannelMode||'Message';
+    messageResult.innerHTML='<div class="result-head"><div class="result-file"><b>'+esc(channelName)+' check</b><span>Analyzed locally · Message text is not saved</span></div><span class="verdict '+band+'">'+labels[band]+'</span></div><section class="risk-meter '+band+'" aria-label="Warning-sign score '+score+' out of 100"><div class="meter-head"><div><span>Warning-sign score</span><strong>'+score+'<small> / 100</small></strong></div><b>'+labels[band]+'</b></div><div class="meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+score+'" aria-valuetext="'+score+' out of 100, '+labels[band]+'"><i style="width:'+score+'%"></i></div><p>Points are added when a simple text rule matches. This is not a tested accuracy score or the chance the message is a scam.</p></section><p class="result-summary">'+summaries[band]+'</p><div class="finding-list message-findings">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div><b>'+esc(f.title)+'</b>'+esc(f.detail)+'</div><span class="finding-points '+(f.points?'active':'')+'">'+(f.points?'+'+f.points:'context')+'</span></div>').join('')+'</div><div class="privacy-strip action-next"><span><b>Suggested next step:</b> '+esc(actions[band])+'</span></div><p class="disclaimer">Aman checks only the text you paste. It does not identify the sender, confirm a fine, or visit a link. Rules can miss scams or flag legitimate messages. Always verify unexpected requests through an official app or website you find independently.</p>';
+    messageResult.classList.add('show');
+    document.dispatchEvent(new CustomEvent('aman:message-checked',{detail:{channel:channelName,score,band,label:labels[band]}}));
+  }
+  async function hash(bytes){if(!crypto.subtle)throw new Error('SHA-256 is unavailable in this browser context.');const digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('')}
+  async function scan(file){
+    result.classList.remove('show');
+    if(file.size>maxBytes){notify('This prototype supports files up to 50 MB.');return}
+    document.getElementById('dropTitle').textContent='Checking file locally…';
+    document.getElementById('dropSub').textContent='Reading file bytes. Nothing is being uploaded or executed.';
+    choose.disabled=true;
+    try{
+      const bytes=await file.arrayBuffer(),all=new Uint8Array(bytes),sample=all.subarray(0,Math.min(all.length,sampleBytes));
+      const header=magicType(sample),findings=analyze(file,sample,header,all);
+      let sha='Unavailable in this browser';try{sha=await hash(bytes)}catch{}
+      const score=scoreFor(findings),band=scoreBand(score);
+      renderResult(file,header,findings,sha,score,band);
+      recent.unshift({name:file.name,size:file.size,level:band,risk:score,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+      recent=recent.slice(0,5);renderRecent();
+    }catch(err){notify(err.message||'The file could not be checked in this browser.')}
+    finally{document.getElementById('dropTitle').textContent='Drop a file here to check it';document.getElementById('dropSub').textContent='or choose a file from your device';choose.disabled=false}
+  }
+  function renderResult(file,header,findings,sha,score,band){
+    const labels={green:'Looks OK',yellow:'Caution',orange:'Elevated risk',red:'High risk'};
+    const summaries={green:'The checks found no obvious warning signs. This does not prove the file is safe.',yellow:'A warning sign was found. Review it and verify the source before opening if you were not expecting this file.',orange:'Several warning signs need attention. Keep the file closed until you verify it.',red:'Strong warning signs were found. Do not open or extract this file.'};
+    const actions={green:'Keep your device security software enabled and only open files from sources you trust.',yellow:'Review the finding and verify the sender through another trusted channel before opening.',orange:'Keep it closed. Verify the sender separately or ask your IT/security team to review it.',red:'Do not open or extract it. Delete it if you do not need it, or ask your IT/security team to review it.'};
+    result.innerHTML='<div class="result-head"><div class="result-file"><b>'+esc(file.name)+'</b><span>'+formatSize(file.size)+' · '+esc(file.type||'Unknown MIME type')+' · Detected: '+esc(header)+'</span></div><span class="verdict '+band+'">'+labels[band]+'</span></div><section class="risk-meter '+band+'" aria-label="Risk score '+score+' out of 100"><div class="meter-head"><div><span>Risk score</span><strong>'+score+'<small> / 100</small></strong></div><b>'+labels[band]+'</b></div><div class="meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+score+'" aria-valuetext="'+score+' out of 100, '+labels[band]+'"><i style="width:'+score+'%"></i></div><p>Points add up from matched rules. This is a heuristic indicator, not a probability or antivirus verdict.</p></section><p class="result-summary">'+summaries[band]+'</p><div class="finding-list">'+findings.map(f=>'<div class="finding '+f.level+'"><span class="badge">'+(f.level==='high'?'!':f.level==='warn'?'!':'i')+'</span><div><b>'+esc(f.title)+'</b>'+esc(f.detail)+'</div></div>').join('')+'</div><div class="privacy-strip" style="margin-top:12px"><span><b>Suggested next step:</b> '+esc(actions[band])+'</span></div><div class="hashbox"><span>SHA-256 fingerprint</span><div class="hashline"><code id="hashValue">'+esc(sha)+'</code><button class="copy" id="copyHash" type="button">Copy</button></div></div><p class="disclaimer">This is a basic heuristic check, not a malware verdict. It does not unpack archives, inspect every file format, or compare the file with a threat intelligence database. A green score does not guarantee safety. Keep your operating system antivirus enabled.</p>';
+    result.classList.add('show');
+    document.getElementById('copyHash').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sha);notify('SHA-256 copied.')}catch{notify('Copy is unavailable; select the hash to copy it.')}});
+  }
+  function renderRecent(){
+    if(!recent.length){recentList.innerHTML='<div class="recent-empty">Files you check in this session will appear here.</div>';return}
+    recentList.innerHTML=recent.map(r=>'<div class="recent-item"><span class="title-icon" style="width:27px;height:27px;font-size:10px">▤</span><div class="recent-file"><b title="'+esc(r.name)+'">'+esc(r.name)+'</b><span>'+formatSize(r.size)+' · '+r.time+'</span></div><span class="recent-mark '+r.level+'">'+(r.level==='red'?'HIGH RISK':r.level==='orange'?'ELEVATED':r.level==='yellow'?'CAUTION':'LOOKS OK')+' · '+r.risk+'/100</span></div>').join('');
+  }
+})();
+</script>
+
+<script>
+(()=>{
+  const cases=[
+    {id:'DEMO-101',source:'Fictional demo case',title:'Fictional government payment notice',channel:'SMS',indicator:'finance-payment.example/settle',status:'Needs verification',summary:'Synthetic scenario: an urgent payment request uses a fictional link and asks for sensitive details.'},
+    {id:'DEMO-102',source:'Fictional demo case',title:'Fictional refund website',channel:'Website',indicator:'refund-service.example',status:'Evidence review',summary:'Synthetic scenario: a lookalike refund page requests identity information.'}
+  ];
+  const channels=[];const historyEntries=[];let activeCase=null,sequence=1;
+  const escapeHtml=value=>String(value).replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const navFor={overviewPage:'overviewNav',casesPage:'casesNav',channelsPage:'casesNav',historyPage:'historyNav',toolsPage:'smsNav'};
+  const labels={overviewPage:'Home',casesPage:'Team review',channelsPage:'Official channels',reportsPage:'Report a message',historyPage:'History',toolsPage:'Check a message'};
+  const channelConfig={
+    'SMS':{title:'Check a suspicious SMS',hero:'Check an SMS before you pay.',description:'Paste the text to look for payment pressure, suspicious links, or requests for private details.',label:'SMS text',placeholder:'Paste the SMS text here…',note:'Aman checks text locally. It does not open links or verify the sender. Example messages are fictional.',button:'Check SMS',example:'Try fictional SMS'},
+    'WhatsApp':{title:'Check a suspicious WhatsApp message',hero:'Check a WhatsApp message.',description:'Paste the text to look for payment pressure, suspicious links, or requests for private details.',label:'WhatsApp message',placeholder:'Paste the message text here…',note:'Paste only the text. Remove names and private details. Aman does not open links or verify the sender.',button:'Check WhatsApp message',example:'Try fictional WhatsApp message'},
+    'Email':{title:'Check a suspicious email',hero:'Check an email before you reply.',description:'Paste the subject and text to look for pressure, suspicious links, or requests for private details.',label:'Email text',placeholder:'Paste the email subject and body here…',note:'Paste the subject and message text. Do not include attachments, passwords, or private account details.',button:'Check email text',example:'Try fictional email'},
+    'Phone call notes':{title:'Check notes from a suspicious call',hero:'Check notes from a call.',description:'Type what the caller said. Aman checks your notes only. It does not record audio or identify callers.',label:'Call notes',placeholder:'Type what the caller said. Do not record or upload audio.',note:'Aman checks notes you type. It does not record calls, identify callers, or verify phone numbers.',button:'Check call notes',example:'Try fictional call notes'}
+  };
+  window.amanChannelMode='SMS';
+  window.amanExampleForChannel=channel=>({
+    'SMS':'Dubai Police: A traffic fine is unpaid. Pay AED 100 today to avoid a late penalty: https://dubai-police-alert.example/fine. Do not reply with personal details.',
+    'WhatsApp':'UAE Pass Support: Your account will be locked unless you verify it now. Open https://uaepass-security.example/verify and send us the OTP we texted you.',
+    'Email':'Subject: Abu Dhabi government refund. We could not process your refund. Visit https://abudhabi-finance-refund.example and reply with your bank details and Emirates ID to receive it.',
+    'Phone call notes':'Caller claimed to be from Fujairah Finance. They said I had an overdue payment, pressured me to transfer AED 100 today, and asked me to send them the one-time code.'
+  }[channel]||'A fictional message asks for an urgent payment and personal information.');
+  function setPage(page,navId){
+    ['overviewPage','casesPage','channelsPage','reportsPage','historyPage','toolsPage'].forEach(id=>{const node=document.getElementById(id);if(node)node.hidden=id!==page});
+    document.querySelectorAll('.nav button').forEach(button=>button.classList.remove('selected'));
+    const selectedId=navId||navFor[page];const selected=selectedId?document.getElementById(selectedId):null;if(selected)selected.classList.add('selected');
+    document.getElementById('crumbLabel').textContent=labels[page]||'Aman';
+    document.getElementById('side').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function addHistory(type,channel,outcome,detail=''){
+    historyEntries.unshift({type,channel,outcome,detail,time:new Date().toLocaleString()});historyEntries.splice(40);
+    renderHistory();
+  }
+  function renderHistory(){
+    const host=document.getElementById('historyList');if(!host)return;
+    if(!historyEntries.length){host.innerHTML='<p class="history-empty">No checks or reports yet.</p>';return}
+    host.innerHTML=historyEntries.map(item=>'<div class="history-item"><div class="history-type">'+escapeHtml(item.type)+'</div><div><strong>'+escapeHtml(item.channel)+'</strong><small>'+escapeHtml(item.time)+(item.detail?' · '+escapeHtml(item.detail):'')+'</small></div><span class="status-tag neutral">'+escapeHtml(item.outcome)+'</span></div>').join('');
+  }
+  function renderOverview(){
+    const host=document.getElementById('overviewCaseList');if(!host)return;
+    host.innerHTML=cases.slice(0,4).map(item=>'<div class="work-row"><span class="case-id">'+escapeHtml(item.id)+'</span><div><b>'+escapeHtml(item.title)+'</b><small>'+escapeHtml(item.channel)+' · '+escapeHtml(item.indicator)+'</small></div><button type="button" class="text-button" data-open-case="'+escapeHtml(item.id)+'">Review →</button></div>').join('');
+  }
+  function renderCases(){
+    const plainStatus={'Needs verification':'Needs checking','Evidence review':'Being checked','Owner confirmation pending':'Waiting for official team','Confirmed for response':'Ready for team follow-up · demo','Closed in demo':'Done · demo only'};
+    document.getElementById('caseTableBody').innerHTML=cases.map(item=>'<tr><td><strong>'+escapeHtml(item.id)+'</strong><small>'+escapeHtml(item.source||'Demo case')+'</small></td><td>'+escapeHtml(item.channel)+'</td><td><small>'+escapeHtml(item.indicator)+'</small></td><td><span class="status-tag">'+escapeHtml(plainStatus[item.status]||item.status)+'</span></td><td><button type="button" class="text-button" data-open-case="'+escapeHtml(item.id)+'">Open report</button></td></tr>').join('');
+    renderOverview();
+  }
+  function openCase(id){
+    const item=cases.find(entry=>entry.id===id);if(!item)return;activeCase=id;
+    setPage('casesPage');const panel=document.getElementById('caseDetail');panel.hidden=false;
+    document.getElementById('caseDetailTitle').textContent=item.title;
+    const isSynthetic=item.source==='Fictional demo case';
+    document.getElementById('caseDetailMeta').textContent=item.id+' · '+item.channel+' · '+(isSynthetic?'Fictional demo case':'Local report · not transmitted');
+    document.getElementById('caseDetailSummary').textContent=item.summary+(isSynthetic?' This is a fictional scenario, not an active threat.':' This report is unverified and remains only in this browser session.');
+    document.getElementById('caseStatus').value=['Needs verification','Evidence review','Owner confirmation pending','Confirmed for response','Closed in demo'].includes(item.status)?item.status:'Needs verification';
+    updateCaseStatusHint();document.querySelectorAll('[data-evidence]').forEach(box=>box.checked=false);document.getElementById('caseActionMessage').textContent='';panel.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function updateCaseStatusHint(){
+    const hints={'Needs verification':'No one has checked this report yet. Start by reviewing the details.','Evidence review':'A reviewer is checking the message, link, and time. This does not mean the report is true.','Owner confirmation pending':'The team that runs the real service still needs to say whether this channel belongs to them.','Confirmed for response':'The reviewer thinks the response team should decide what to do next. Aman has not confirmed anything and cannot take action.','Closed in demo':'This report is marked done in this browser only. No one outside this page was contacted.'};
+    document.getElementById('caseStatusHint').textContent=hints[document.getElementById('caseStatus').value]||'This label tracks work only. It does not confirm whether the report is true or send an action.';
+  }
+  function openScanner(channel,navId){
+    const mode=channelConfig[channel]?channel:'SMS',config=channelConfig[mode];window.amanChannelMode=mode;
+    setPage('toolsPage',navId||({SMS:'smsNav',WhatsApp:'whatsappNav',Email:'emailNav','Phone call notes':'phoneNav'}[mode]));
+    document.getElementById('scannerHeroTitle').textContent=config.hero;document.getElementById('scannerHeroDescription').textContent=config.description;document.getElementById('scannerVersion').textContent='Text stays in this browser';document.getElementById('messageTitle').textContent=config.title;
+    document.getElementById('messageDescription').textContent='Look for payment pressure, suspicious links, or requests for sensitive details.';
+    document.getElementById('messageLabel').textContent=config.label;
+    document.getElementById('messageInput').placeholder=config.placeholder;
+    document.getElementById('messageNote').textContent=config.note;
+    document.getElementById('analyzeMessage').textContent=config.button;
+    document.getElementById('messageExample').textContent=config.example;
+    document.getElementById('reportFromMessage').textContent=mode==='Phone call notes'?'Report this call':mode==='Email'?'Report this email':mode==='SMS'?'Report this SMS':'Report this message';
+    document.getElementById('messageInput').value='';document.getElementById('messageCount').textContent='0 / 5,000';document.getElementById('messageResult').classList.remove('show');
+    window.amanSetScannerMode('message');
+  }
+  document.querySelectorAll('[data-route]').forEach(button=>button.addEventListener('click',()=>setPage(button.dataset.route)));
+  document.querySelectorAll('[data-channel]').forEach(button=>button.addEventListener('click',()=>openScanner(button.dataset.channel,button.id||undefined)));
+  document.getElementById('scanNav').addEventListener('click',()=>openScanner('SMS','smsNav'));
+  document.getElementById('recentNav').addEventListener('click',()=>setPage('historyPage','historyNav'));
+  document.querySelectorAll('[data-open-message-tool]').forEach(button=>button.addEventListener('click',()=>openScanner('SMS','smsNav')));
+  document.querySelectorAll('[data-open-file-tool]').forEach(button=>button.addEventListener('click',()=>openScanner('SMS','smsNav')));
+  document.addEventListener('click',event=>{const button=event.target.closest('[data-open-case]');if(button)openCase(button.dataset.openCase)});
+  document.getElementById('closeCaseDetail').addEventListener('click',()=>{document.getElementById('caseDetail').hidden=true;activeCase=null});
+  document.getElementById('saveCaseReview').addEventListener('click',()=>{
+    const item=cases.find(entry=>entry.id===activeCase);if(!item)return;item.status=document.getElementById('caseStatus').value;renderCases();document.getElementById('caseActionMessage').textContent='Progress saved in this browser session only. No status was sent to an official team.';const displayStatus={'Needs verification':'Needs checking','Evidence review':'Being checked','Owner confirmation pending':'Waiting for official team','Confirmed for response':'Ready for team follow-up · demo','Closed in demo':'Done · demo only'};addHistory('Report progress','Response team',displayStatus[item.status]||item.status,item.id);
+  });
+  document.getElementById('caseStatus').addEventListener('change',updateCaseStatusHint);
+  document.getElementById('downloadCaseDraft').addEventListener('click',()=>{
+    const item=cases.find(entry=>entry.id===activeCase);if(!item)return;
+    const checked=[...document.querySelectorAll('[data-evidence]:checked')].map(box=>box.parentElement.textContent.trim());
+    const body=['AMAN DEMO REVIEW SUMMARY','Demo only. This is not a verified report or official notice.','Report ID: '+item.id,'Reported channel: '+item.channel,'Link or account provided: '+item.indicator,'Current progress: '+document.getElementById('caseStatus').selectedOptions[0].textContent,'Review checklist:',...(checked.length?checked.map(line=>'- '+line):['- No checklist items selected']),'This file was not sent. The response team must check the facts before deciding what to do.'].join('\n');
+    const url=URL.createObjectURL(new Blob([body],{type:'text/plain;charset=utf-8'}));const link=document.createElement('a');link.href=url;link.download=item.id.toLowerCase()+'-demo-review-summary.txt';link.click();URL.revokeObjectURL(url);document.getElementById('caseActionMessage').textContent='Downloaded a demo review summary. It was not sent to any provider.';addHistory('Review summary','Response team','Downloaded',item.id);
+  });
+  function renderChannels(){
+    const host=document.getElementById('channelList');if(!channels.length){host.className='registry-empty';host.textContent='No channel records are configured. Add an example or wait for an authorized owner-maintained source.';return}
+    host.className='';host.innerHTML=channels.map(item=>'<div class="registry-row"><div><strong>'+escapeHtml(item.name)+'</strong><small>'+escapeHtml(item.indicator)+'</small></div><div>Owner or team<small>'+escapeHtml(item.owner)+'</small></div><div>Lifecycle state<small>'+escapeHtml(item.lifecycle)+'</small></div><span class="status-tag neutral">Unverified demo</span></div>').join('');
+  }
+  document.getElementById('loadSampleChannels').addEventListener('click',()=>{
+    if(!channels.some(item=>item.indicator==='payments.example'))channels.push({name:'Example payment service',indicator:'payments.example',owner:'Example service owner',lifecycle:'Approval review'});
+    if(!channels.some(item=>item.indicator==='support.example'))channels.push({name:'Example support channel',indicator:'support.example',owner:'Example communications team',lifecycle:'Change review'});
+    renderChannels();document.getElementById('channelFormStatus').textContent='Synthetic records added to this session. They are not official channels.';
+  });
+  document.getElementById('channelForm').addEventListener('submit',event=>{
+    event.preventDefault();channels.push({name:document.getElementById('channelName').value.trim(),indicator:document.getElementById('channelIndicator').value.trim(),owner:document.getElementById('channelOwner').value.trim(),lifecycle:document.getElementById('channelLifecycle').value});renderChannels();event.currentTarget.reset();document.getElementById('channelFormStatus').textContent='Session-only record added as unverified. It does not establish that the channel is official.';addHistory('Channel record','Response team','Added · unverified','');
+  });
+  document.getElementById('reportViewQueue').addEventListener('click',()=>setPage('casesPage','casesNav'));
+  document.getElementById('reportFromMessage').addEventListener('click',()=>{
+    const mode=window.amanChannelMode||'SMS';
+    const reportType=document.getElementById('reportType');
+    reportType.value=mode==='Email'?'Email':mode==='Phone call notes'?'Phone call or other channel':'SMS or messaging app';
+    setPage('reportsPage');
+  });
+  document.getElementById('reportForm').addEventListener('submit',event=>{
+    event.preventDefault();const channel=document.getElementById('reportType').value;const indicator=document.getElementById('reportIndicator').value.trim()||'No link or public name provided';const description=document.getElementById('reportDescription').value.trim();
+    const id='DEMO-USER-'+String(sequence++).padStart(3,'0');cases.unshift({id,source:'Local report · not transmitted',title:'User-submitted report',channel,indicator,status:'Needs verification',summary:(description||'No description provided.')+' This report was created only in the current browser session.'});renderCases();
+    document.getElementById('reportSuccess').hidden=false;document.getElementById('reportSuccess').textContent='Report '+id+' now appears in Team review in this browser session. No real team received it.';document.getElementById('reportViewQueue').hidden=false;document.getElementById('reportStatus').textContent='';event.currentTarget.reset();addHistory('Attack report',channel,'Demo only',id);
+  });
+  document.addEventListener('aman:message-checked',event=>{const detail=event.detail||{};addHistory('Message check',detail.channel||'Message',detail.label||'Checked',(detail.score??'')+'/100');});
+  document.getElementById('clearHistory').addEventListener('click',()=>{if(!historyEntries.length)return;if(window.confirm('Clear this tab’s session history?')){historyEntries.length=0;renderHistory()}});
+  renderCases();renderChannels();renderHistory();
+})();
+</script>
+</body>
+</html>
+
